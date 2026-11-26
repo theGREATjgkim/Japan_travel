@@ -6,8 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="교토·오사카 여행" />
-  <link rel="apple-touch-icon" href="./icon.png" />
-  <link rel="icon" type="image/png" href="./icon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=2" />
   <title>교토·오사카 5박 6일 가족 여행 가이드</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,7 +36,7 @@
       scrollbar-width: none;
     }
     .ios-glass {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
@@ -52,10 +51,10 @@
       }
     }
     .animate-card {
-      animation: fadeSlideUp 0.24s ease-out forwards;
+      animation: fadeSlideUp 0.22s ease-out forwards;
     }
     .check-bounce:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
     @keyframes spinOnce {
       from { transform: rotate(0deg); }
@@ -68,7 +67,7 @@
 </head>
 <body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
 
-  <!-- 상단 고정 헤더 & 일자/전체준비물 탭 -->
+  <!-- 상단 고정 헤더 & 일차/전체준비물 탭 -->
   <header class="sticky top-0 z-40 ios-glass border-b border-stone-200/80" style="padding-top: var(--safe-top);">
     <div class="max-w-lg mx-auto px-4 pt-3 pb-2">
       <!-- 상단 타이틀 & 동기화 상태 / 퀵 유틸리티 버튼 -->
@@ -91,18 +90,21 @@
           </p>
         </div>
 
-        <!-- 우측 퀵 유틸리티 버튼 (새로고침 / 환율 / 연동 설정) -->
-        <div class="flex items-center gap-1.5 shrink-0 pt-0.5">
-          <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="시트 새로고침" class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 border border-emerald-200/80 text-sm font-bold transition shadow-2xs">
+        <!-- 우측 퀵 유틸리티 버튼 (새로고침 / 환율 / 숙소 / 연동 설정) -->
+        <div class="flex items-center gap-1 shrink-0 pt-0.5">
+          <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="시트 새로고침" aria-label="시트 새로고침" class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 border border-emerald-200/80 text-sm font-bold transition">
             <span id="refreshIcon">🔄</span>
           </button>
-          <button onclick="openModal('currencyModal')" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 border border-amber-200/80 text-xs font-bold transition shadow-2xs">
+          <button onclick="openModal('currencyModal')" title="환율 계산기" class="flex items-center gap-1 px-2 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 border border-amber-200/80 text-xs font-bold transition">
             <span>💴</span>
             <span>환율</span>
           </button>
-          <button onclick="openModal('syncModal')" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 border border-slate-200/80 text-xs font-bold transition shadow-2xs">
+          <button onclick="openModal('hotelModal')" title="숙소 안내" class="flex items-center gap-1 px-2 h-9 rounded-xl bg-indigo-50 hover:bg-indigo-100 active:scale-95 text-indigo-900 border border-indigo-200/80 text-xs font-bold transition">
+            <span>🏨</span>
+            <span>숙소</span>
+          </button>
+          <button onclick="openModal('syncModal')" title="연동 설정" aria-label="연동 설정" class="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 border border-slate-200/80 text-xs font-bold transition">
             <span>⚙️</span>
-            <span>연동</span>
           </button>
         </div>
       </div>
@@ -132,7 +134,7 @@
   <!-- 하단 고정 이전/다음 일차 이동 바 -->
   <footer id="bottomFooter" class="fixed bottom-0 inset-x-0 z-30 ios-glass border-t border-stone-200/80" style="padding-bottom: var(--safe-bottom);">
     <div class="max-w-lg mx-auto px-4 py-2.5 flex items-center justify-between gap-2.5">
-      <button id="prevDayBtn" onclick="changeTab(-1)" class="flex-1 flex items-center justify-center gap-1 py-3 px-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-bold text-xs sm:text-sm shadow-2xs active:scale-[0.98] disabled:opacity-35 disabled:pointer-events-none transition">
+      <button id="prevDayBtn" onclick="changeTab(-1)" class="flex-1 flex items-center justify-center gap-1 py-3 px-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-bold text-xs sm:text-sm active:scale-[0.98] disabled:opacity-35 disabled:pointer-events-none transition">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         <span id="prevDayLabel" class="truncate">이전</span>
       </button>
@@ -142,7 +144,7 @@
         <span id="footerProgressText" class="text-xs font-extrabold mt-0.5 leading-none">0 / 0</span>
       </button>
 
-      <button id="nextDayBtn" onclick="changeTab(1)" class="flex-1 flex items-center justify-center gap-1 py-3 px-2.5 rounded-2xl bg-[#C84B31] text-white font-bold text-xs sm:text-sm shadow-sm active:scale-[0.98] disabled:opacity-35 disabled:pointer-events-none transition">
+      <button id="nextDayBtn" onclick="changeTab(1)" class="flex-1 flex items-center justify-center gap-1 py-3 px-2.5 rounded-2xl bg-[#C84B31] text-white font-bold text-xs sm:text-sm active:scale-[0.98] disabled:opacity-35 disabled:pointer-events-none transition">
         <span id="nextDayLabel" class="truncate">다음</span>
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
       </button>
@@ -150,7 +152,7 @@
   </footer>
 
   <!-- 모달 1: 엔화 ↔ 원화 양방향 빠른 계산기 (100엔 = 900원 기준) -->
-  <div id="currencyModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45 backdrop-blur-xs" onclick="closeModalOnBackdrop(event, 'currencyModal')">
+  <div id="currencyModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'currencyModal')">
     <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card" style="padding-bottom: calc(24px + var(--safe-bottom));">
       <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
       <div class="flex items-center justify-between mb-4">
@@ -196,8 +198,64 @@
     </div>
   </div>
 
-  <!-- 모달 2: Google 시트 연동 설정 & 공유 안내 -->
-  <div id="syncModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45 backdrop-blur-xs" onclick="closeModalOnBackdrop(event, 'syncModal')">
+  <!-- 모달 2: 숙소 정보 빠른 확인 -->
+  <div id="hotelModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'hotelModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[85vh] overflow-y-auto" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">🏨 숙소 정보 요약</h2>
+          <p class="text-xs text-stone-500 mt-0.5">교토 2박 · 오사카 3박 가족 숙소 안내</p>
+        </div>
+        <button onclick="closeModal('hotelModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded-md bg-[#1E3A5F] text-white text-[10px] font-bold">1/10 ~ 1/12 (2박)</span>
+            <span class="text-[11px] font-bold text-indigo-900">교토 · 대욕장 보유</span>
+          </div>
+          <div class="text-[15px] font-extrabold text-stone-900">게이오 프렐리아 호텔 교토 가라스마 고조</div>
+          <p class="text-stone-600 leading-relaxed">
+            • 교토역 하차 후 택시 직행 약 5분(약 800엔), 지하철 고조역 도보 약 1분<br />
+            • 2일차 귀가 후 대욕장에서 피로 회복 가능, 3일차 체크아웃 후 교토역 코인락커 활용
+          </p>
+          <div class="pt-1 flex gap-2">
+            <button onclick="copyText('게이오 프렐리아 호텔 교토 가라스마 고조')" class="px-3 py-1.5 rounded-xl bg-white border border-indigo-200 text-indigo-900 font-bold active:scale-95">
+              숙소명 복사
+            </button>
+            <a href="https://www.google.com/maps/search/?api=1&query=%EA%B2%8C%EC%9D%B4%EC%98%A4+%ED%94%84%EB%A0%B4%EB%A6%AC%EC%95%84+%ED%98%B8%ED%85%94+%EA%B5%90%ED%86%A0+%EA%B0%80%EB%9D%BC%EC%8A%A4%EB%A7%88+%EA%B3%A0%EC%A1%B0" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-[#1E3A5F] text-white font-bold">
+              구글 지도 열기 ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-orange-50/70 border border-orange-200/80 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded-md bg-[#C84B31] text-white text-[10px] font-bold">1/12 ~ 1/15 (3박)</span>
+            <span class="text-[11px] font-bold text-[#C84B31]">오사카 난바 · 도톤보리 인접</span>
+          </div>
+          <div class="text-[15px] font-extrabold text-stone-900">난바 코코호텔</div>
+          <p class="text-stone-600 leading-relaxed">
+            • 오사카 메트로 미도스지선 난바역 접근 편리, 도톤보리·쇼핑 동선 연계 우수<br />
+            • 6일차 체크아웃 후 택시로 난바 OCAT 이동(약 5~10분) → 간사이공항 리무진버스 탑승
+          </p>
+          <div class="pt-1 flex gap-2">
+            <button onclick="copyText('난바 코코호텔')" class="px-3 py-1.5 rounded-xl bg-white border border-orange-200 text-[#C84B31] font-bold active:scale-95">
+              숙소명 복사
+            </button>
+            <a href="https://www.google.com/maps/search/?api=1&query=%EB%82%9C%EB%B0%94+%EC%BD%94%EC%BD%94%ED%98%B8%ED%85%94" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-[#C84B31] text-white font-bold">
+              구글 지도 열기 ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 3: Google 시트 연동 설정 & 공유 안내 -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'syncModal')">
     <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[88vh] overflow-y-auto" style="padding-bottom: calc(24px + var(--safe-bottom));">
       <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
       <div class="flex items-center justify-between mb-3">
@@ -315,8 +373,8 @@
         shortDate: "1/10(일)",
         region: "간사이 → 교토",
         title: "간사이 입국(15:30) & 교토 이동 · 대욕장 휴식",
-        summary: "간사이공항 도착(15:30) → 하루카 특급 이동 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
-        routeText: "간사이공항 도착(15:30) → 무인 발권기 하루카 지정석 교환 및 교토역 이동 → 교토역 창구 자녀 어린이용 교통카드 발급 → 교토역 앞 택시 탑승 및 호텔 직행 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
+        summary: "15:30 간사이공항 도착 → 하루카 특급 이동 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
+        routeText: "15:30 간사이공항 도착 → 무인 발권기 하루카 지정석 교환 및 교토역 이동 → 교토역 창구 자녀 어린이용 교통카드 발급 → 교토역 앞 택시 탑승 및 호텔 직행 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
         hotel: "게이오 프렐리아 호텔 교토 가라스마 고조",
         transport: "하루카 특급열차 + 교토역→호텔 택시",
         fatigueLevel: "낮음",
@@ -452,7 +510,7 @@
         ],
         ticketTips: [
           "컵누들뮤지엄 오사카 이케다: 입장료 무료 / '마이 컵누들 팩토리' 체험비 1인 500엔(현장 자판기 티켓 구입, 3인 1,500엔)",
-          "오사카시립 과학관: 상설전시 초·중학생 무료, 성인 400엔 / 플라네타륨 성인 600엔, 초등 300엔 (현장 무인기/매표소 발권)",
+          "오사카시립 과학관: 상설전시 초·중학생 무료, 성인 400엔 / 플라네타리움 성인 600엔, 초등 300엔 (현장 무인기/매표소 발권)",
           "국립국제미술관: 소장품전 기준 성인 430엔, 초·중학생 무료 (특별전 별도)",
           "우메다 스카이빌딩 공중정원 전망대: 성인 2,000엔, 초등학생 500엔"
         ],
@@ -611,7 +669,6 @@
         const savedAcc = localStorage.getItem(STORAGE_KEYS.ACCORDION);
         if (savedAcc) state.accordion = { ...state.accordion, ...JSON.parse(savedAcc) };
 
-        // 이전 성공 캐시가 있으면 우선 복원
         const cachedPayload = localStorage.getItem(STORAGE_KEYS.CACHED_DATA);
         const lastSync = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
         if (cachedPayload) {
@@ -648,12 +705,34 @@
     // =========================================================================
     // 5. Google Sheets gviz API 실시간 Fetch 및 파싱 엔진
     // =========================================================================
+    // 잘못된 시간 조각(예: 앞 시간이 없는 단독 ':30', 중복 콜론 '15::30')을 자연스럽게 정제합니다.
+    function sanitizeTimeStrings(rawText) {
+      if (!rawText) return "";
+      let cleaned = String(rawText);
+
+      // 1) 중복 콜론 정리 (예: 15::30 -> 15:30)
+      cleaned = cleaned.replace(/(\d{1,2})::+(\d{2})/g, "$1:$2");
+
+      // 2) 괄호 안 단독 ':30' 등 시간 조각 제거 (예: (:30) -> '')
+      cleaned = cleaned.replace(/\(\s*:\d{2}\s*\)/g, "");
+
+      // 3) 앞에 숫자가 없는 단독 ':30' / ':00' / ':15' / ':45' 토큰 제거
+      cleaned = cleaned.replace(/(^|[^\d:])\s*:\d{2}(?=\s|$|[,·/)\]}→])/g, "$1");
+
+      // 4) 연속된 공백이나 중복 구분자 정리
+      cleaned = cleaned
+        .replace(/[ \t]{2,}/g, " ")
+        .replace(/\(\s*\)/g, "")
+        .trim();
+
+      return cleaned;
+    }
+
     function buildGvizUrl(sheetId, tabName) {
       return `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}`;
     }
 
     function parseGvizResponseText(rawText) {
-      // Google gviz 응답: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
       const startIdx = rawText.indexOf("{");
       const endIdx = rawText.lastIndexOf("}");
       if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
@@ -671,10 +750,10 @@
       if (!row || !row.c || !row.c[colIndex]) return "";
       const cell = row.c[colIndex];
       if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") {
-        return String(cell.f).trim();
+        return sanitizeTimeStrings(String(cell.f).trim());
       }
       if (cell.v !== undefined && cell.v !== null) {
-        return String(cell.v).trim();
+        return sanitizeTimeStrings(String(cell.v).trim());
       }
       return "";
     }
@@ -687,36 +766,31 @@
       return str === "TRUE" || str === "O" || str === "Y" || str === "완료";
     }
 
-    // 텍스트를 줄바꿈 또는 불릿(•, -, ▪) 기준으로 배열 분리
     function splitMultilineItems(text) {
-      if (!text) return [];
-      return text
+      const sanitized = sanitizeTimeStrings(text);
+      if (!sanitized) return [];
+      return sanitized
         .split(/\r?\n/)
-        .map(line => line.replace(/^[\s•·▪\-*]+/, "").trim())
+        .map(line => sanitizeTimeStrings(line.replace(/^[\s•·▪\-*]+/, "").trim()))
         .filter(line => line.length > 0 && line !== "-" && line !== "없음");
     }
 
-    // 동선 텍스트를 '→' 또는 줄바꿈 기준으로 단계 분리
     function splitRouteSteps(text) {
-      if (!text) return [];
-      // 줄바꿈과 '→' 모두 고려하여 깔끔한 단계 배열 생성
-      const rawParts = text.includes("→")
-        ? text.split(/\s*→\s*|\r?\n+/)
-        : text.split(/\r?\n+/);
+      const sanitized = sanitizeTimeStrings(text);
+      if (!sanitized) return [];
+      const rawParts = sanitized.includes("→")
+        ? sanitized.split(/\s*→\s*|\r?\n+/)
+        : sanitized.split(/\r?\n+/);
       return rawParts
-        .map(s => s.replace(/^[\s•·\-*\d.]+/, "").trim())
+        .map(s => sanitizeTimeStrings(s.replace(/^[\s•·\-*\d.]+/, "").trim()))
         .filter(s => s.length > 1);
     }
 
-    // '1일차', 'Day 1', '1' 등에서 1~6 숫자 추출
     function extractDayNumber(str) {
       if (!str) return null;
       const match = String(str).match(/([1-6])\s*(?:일차|일|day)?/i);
-      if (match) {
-        // 해당 셀이 일차 표기 셀인지 검증 (예: '1일차', 'Day 1', '1')
-        if (/^(?:day\s*)?[1-6](?:일차|일)?$/i.test(String(str).trim())) {
-          return parseInt(match[1], 10);
-        }
+      if (match && /^(?:day\s*)?[1-6](?:일차|일)?$/i.test(String(str).trim())) {
+        return parseInt(match[1], 10);
       }
       return null;
     }
@@ -730,7 +804,6 @@
         clearTimeout(timeoutId);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
-        // 비공개 시트일 때 Google 로그인 HTML 페이지가 반환되는 경우 감지
         if (text.trim().startsWith("<!DOCTYPE html") || text.includes("accounts.google.com")) {
           throw new Error("PRIVATE_SHEET");
         }
@@ -756,16 +829,14 @@
         const fulfilledCount = [scheduleRes, tipsRes, diagnosisRes, packingRes].filter(r => r.status === "fulfilled").length;
 
         if (fulfilledCount === 0) {
-          // 4개 탭 모두 실패 시 (비공개 시트 또는 오프라인)
           const firstReason = scheduleRes.reason?.message || "";
           handleSyncFailure(firstReason, isManual);
           return;
         }
 
-        // 기존 데이터를 베이스로 복제 후 성공한 탭만 정교하게 병합
         const mergedDays = JSON.parse(JSON.stringify(state.days));
 
-        // ① '여행 일정표' 파싱: B(1): 일차, C(2): 날짜, D(3): 주요 일정 및 동선, E(4): 간단 일정, F(5): 숙소, G(6): 이동 교통편
+        // ① '여행 일정표' 파싱
         if (scheduleRes.status === "fulfilled" && scheduleRes.value?.rows) {
           scheduleRes.value.rows.forEach(row => {
             const dayNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
@@ -795,7 +866,7 @@
           });
         }
 
-        // ② '일차별 유의사항 및 팁' 파싱: B(1): 일차, C(2): 일자 및 일정, D(3): 핵심 팁, E(4): 교통 환승 팁, F(5): 입장료/발권, G(6): 준비물/체크
+        // ② '일차별 유의사항 및 팁' 파싱
         if (tipsRes.status === "fulfilled" && tipsRes.value?.rows) {
           const foundDaysInTips = new Set();
           tipsRes.value.rows.forEach(row => {
@@ -810,7 +881,6 @@
               const checkRaw = getCellText(row, 6);
 
               if (dayTitle) {
-                // 예: "1/11(월) 청수사 & 아라시야마"에서 제목 추출
                 const cleanedTitle = dayTitle.replace(/^\d+\/\d+\s*\([^)]+\)\s*/, "").trim();
                 if (cleanedTitle) target.title = cleanedTitle;
               }
@@ -828,7 +898,6 @@
             }
           });
 
-          // 6일차 행이 시트의 '일차별 유의사항 및 팁'에 없을 경우 안내 문구 보강
           if (!foundDaysInTips.has(6)) {
             mergedDays[5].tipsMissingNotice = "시트의 '일차별 유의사항 및 팁' 탭에는 1~5일차까지 작성되어 있어 기본 귀국 안내를 표시합니다.";
           } else {
@@ -836,7 +905,7 @@
           }
         }
 
-        // ③ '일정 점검 및 대안' 파싱: B(1): 일차, C(2): 날짜 및 행선지, D(3): 체력 부담도, E(4): 정밀 진단, F(5): 실전 대안
+        // ③ '일정 점검 및 대안' 파싱
         if (diagnosisRes.status === "fulfilled" && diagnosisRes.value?.rows) {
           diagnosisRes.value.rows.forEach(row => {
             const dayNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
@@ -854,7 +923,7 @@
           });
         }
 
-        // ④ '여행 준비물' 파싱: B(1) 또는 G(6): 시트 체크 상태, C(2): 카테고리, D(3): 준비물 항목, E(4): 대상/수량, F(5): 세부 안내
+        // ④ '여행 준비물' 파싱
         let parsedPacking = state.packing;
         if (packingRes.status === "fulfilled" && packingRes.value?.rows) {
           const tempPacking = [];
@@ -865,7 +934,6 @@
             const qtyCell = getCellText(row, 4);
             const tipCell = getCellText(row, 5);
 
-            // 헤더 행이나 요약 행 필터링
             if (!itemCell || itemCell === "준비물 항목" || itemCell === "항목" || itemCell.includes("합계")) {
               return;
             }
@@ -887,7 +955,6 @@
           }
         }
 
-        // 동기화 성공 상태 반영 및 캐시 저장
         const nowStr = formatKoreanDateTime(new Date());
         state.days = mergedDays;
         state.packing = parsedPacking;
@@ -1097,11 +1164,12 @@
       }
     }
 
-    // 일차별 상세 화면 렌더링
     function renderDayView(dayIdx) {
       const data = state.days[dayIdx];
       const main = document.getElementById("mainContainer");
 
+      const safeTitle = sanitizeTimeStrings(data.title);
+      const safeSummary = sanitizeTimeStrings(data.summary);
       const routeSteps = splitRouteSteps(data.routeText);
       const totalChecks = data.checklist.length;
       const completedChecks = data.checklist.filter((_, idx) => state.checks[`d${data.day}_c${idx}`]).length;
@@ -1124,19 +1192,19 @@
           </div>
 
           <h2 class="text-[19px] font-extrabold text-stone-900 leading-snug tracking-tight">
-            ${data.title}
+            ${safeTitle}
           </h2>
 
           <p class="mt-2 text-[13.5px] leading-relaxed text-stone-600 bg-stone-50 p-3 rounded-2xl border border-stone-100">
-            ${data.summary}
+            ${safeSummary}
           </p>
 
           <!-- 숙소 & 주요 교통편 -->
           <div class="mt-3.5 grid grid-cols-1 gap-2 text-xs">
-            <div class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80">
+            <div onclick="openModal('hotelModal')" class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 cursor-pointer active:scale-[0.99] transition">
               <span class="text-base leading-none mt-0.5">🏨</span>
-              <div>
-                <span class="font-bold text-indigo-950 block">숙소</span>
+              <div class="flex-1 min-w-0">
+                <span class="font-bold text-indigo-950 block">숙소 (탭하여 상세 보기)</span>
                 <span class="text-stone-700 font-medium">${data.hotel}</span>
               </div>
             </div>
@@ -1150,7 +1218,7 @@
           </div>
         </section>
 
-        <!-- 2. 상세 동선 타임라인 ('→' 기준 분리, 터치 체크) -->
+        <!-- 2. 상세 동선 타임라인 -->
         ${renderAccordionCard({
           id: "timeline",
           icon: "🗺️",
@@ -1330,7 +1398,6 @@
       `;
     }
 
-    // 전체 준비물 탭 화면 렌더링 ('여행 준비물' 시트 연동)
     function isPackingItemChecked(item) {
       if (Object.prototype.hasOwnProperty.call(state.packingChecks, item.id)) {
         return !!state.packingChecks[item.id];
@@ -1354,7 +1421,6 @@
         : state.packing.filter(p => p.category === state.packingCategoryFilter);
 
       main.innerHTML = `
-        <!-- 전체 준비물 요약 배너 -->
         <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
           <div class="flex items-center justify-between mb-2">
             <span class="px-2.5 py-1 rounded-xl bg-[#C84B31] text-white text-xs font-extrabold">
@@ -1377,7 +1443,6 @@
             }" style="width: ${percent}%"></div>
           </div>
 
-          <!-- 카테고리 필터 알약 버튼 -->
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-3.5 pb-0.5">
             ${categories.map(cat => {
               const active = state.packingCategoryFilter === cat;
@@ -1397,7 +1462,6 @@
           </div>
         </section>
 
-        <!-- 준비물 리스트 카드 -->
         <section id="checklistSection" class="bg-white rounded-3xl p-4 shadow-xs border border-stone-200/80 space-y-2.5 animate-card">
           ${filteredItems.map(item => {
             const checked = isPackingItemChecked(item);
@@ -1561,7 +1625,6 @@
       if (event.target.id === id) closeModal(id);
     }
 
-    // 환율 계산기 (100엔 = 900원 -> 1엔 = 9원)
     function onJpyChange() {
       const jpyVal = parseFloat(document.getElementById("jpyInput").value);
       const krwInput = document.getElementById("krwInput");
@@ -1595,14 +1658,26 @@
       document.getElementById("jpyInput").focus();
     }
 
-    // 시트 ID 저장 및 동기화
+    function copyText(text) {
+      try {
+        const tempInput = document.createElement("textarea");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        showToast(`📋 "${text}" 복사됨`);
+      } catch (e) {
+        showToast("복사에 실패했습니다.");
+      }
+    }
+
     function saveSheetIdAndSync() {
       const inputVal = document.getElementById("sheetIdInput").value.trim();
       if (!inputVal) {
         showToast("시트 ID를 입력해 주세요.");
         return;
       }
-      // 전체 URL을 붙여넣은 경우 시트 ID만 자동 추출
       const urlMatch = inputVal.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
       state.sheetId = urlMatch ? urlMatch[1] : inputVal;
       document.getElementById("sheetIdInput").value = state.sheetId;
@@ -1631,7 +1706,7 @@
     }
 
     function openSheetInNewTab() {
-      window.open(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(state.sheetId)}/edit`, "_blank");
+      window.open(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(state.sheetId)}/edit`, "_blank", "noopener,noreferrer");
     }
 
     function showToast(msg) {
@@ -1674,7 +1749,6 @@
       loadLocalState();
       updateSyncStatusUI();
       renderAll();
-      // 접속 시 Google 시트 최신 데이터 자동 동기화 시도
       syncFromGoogleSheet(false);
     });
   </script>
