@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="교토·오사카 여행" />
+  <link rel="apple-touch-icon" href="./icon.png" />
+  <link rel="icon" type="image/png" href="./icon.png" />
+  <title>교토·오사카 5박 6일 가족 여행 가이드</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+      background-color: #F6F5F2;
+      color: #1E242B;
+      padding-bottom: calc(92px + var(--safe-bottom));
+      overscroll-behavior-y: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .ios-glass {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-card {
+      animation: fadeSlideUp 0.24s ease-out forwards;
+    }
+    .check-bounce:active {
+      transform: scale(0.97);
+    }
+    @keyframes spinOnce {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-loading {
+      animation: spinOnce 0.8s linear infinite;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- 상단 고정 헤더 & 일자/전체준비물 탭 -->
+  <header class="sticky top-0 z-40 ios-glass border-b border-stone-200/80" style="padding-top: var(--safe-top);">
+    <div class="max-w-lg mx-auto px-4 pt-3 pb-2">
+      <!-- 상단 타이틀 & 동기화 상태 / 퀵 유틸리티 버튼 -->
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#1E3A5F] text-white tracking-tight">
+              2027.01.10 - 01.15
+            </span>
+            <button onclick="openModal('syncModal')" id="syncStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-600 border border-stone-200 active:scale-95 transition">
+              <span id="syncDot" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              <span id="syncStatusText">연동 확인 중...</span>
+            </button>
+          </div>
+          <h1 class="text-[17px] font-extrabold text-stone-900 tracking-tight mt-1 truncate">
+            교토 · 오사카 가족 여행 수첩
+          </h1>
+          <p id="lastSyncTimeText" class="text-[10px] text-stone-400 font-medium mt-0.5">
+            Google 시트 실시간 동기화 지원
+          </p>
+        </div>
+
+        <!-- 우측 퀵 유틸리티 버튼 (새로고침 / 환율 / 연동 설정) -->
+        <div class="flex items-center gap-1.5 shrink-0 pt-0.5">
+          <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="시트 새로고침" class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 border border-emerald-200/80 text-sm font-bold transition shadow-2xs">
+            <span id="refreshIcon">🔄</span>
+          </button>
+          <button onclick="openModal('currencyModal')" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 border border-amber-200/80 text-xs font-bold transition shadow-2xs">
+            <span>💴</span>
+            <span>환율</span>
+          </button>
+          <button onclick="openModal('syncModal')" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 border border-slate-200/80 text-xs font-bold transition shadow-2xs">
+            <span>⚙️</span>
+            <span>연동</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 시트 권한/오프라인 경고 배너 (필요 시 노출) -->
+      <div id="fallbackBanner" class="hidden mb-2 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200/90 text-[11px] text-amber-900 flex items-center justify-between gap-2">
+        <span id="fallbackBannerMsg" class="leading-snug font-medium">
+          시트가 비공개 상태이거나 오프라인이어서 저장된 데이터를 표시합니다.
+        </span>
+        <button onclick="openModal('syncModal')" class="shrink-0 px-2 py-1 rounded-lg bg-amber-200/70 font-bold text-amber-950">
+          해결법
+        </button>
+      </div>
+
+      <!-- 가로 스크롤 Day 1 ~ Day 6 + 전체 준비물 탭 -->
+      <nav id="dayTabs" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1" aria-label="탭 선택">
+        <!-- JS로 동적 렌더링 -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 컨테이너 -->
+  <main id="mainContainer" class="max-w-lg mx-auto px-4 pt-3.5 space-y-3.5">
+    <!-- JS로 선택된 Day 또는 전체 준비물 화면 렌더링 -->
+  </main>
+
+  <!-- 하단 고정 이전/다음 일차 이동 바 -->
+  <footer id="bottomFooter" class="fixed bottom-0 inset-x-0 z-30 ios-glass border-t border-stone-200/80" style="padding-bottom: var(--safe-bottom);">
+    <div class="max-w-lg mx-auto px-4 py-2.5 flex items-center justify-between gap-2.5">
+      <button id="prevDayBtn" onclick="changeTab(-1)" class="flex-1 flex items-center justify-center gap-1 py-3 px-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-bold text-xs sm:text-sm shadow-2xs active:scale-[0.98] disabled:opacity-35 disabled:pointer-events-none transition">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <span id="prevDayLabel" class="truncate">이전</span>
+      </button>
+
+      <button onclick="scrollToChecklist()" class="px-3.5 py-2.5 rounded-2xl bg-[#1E3A5F] text-white flex flex-col items-center justify-center shrink-0 active:scale-95 transition shadow-sm">
+        <span id="footerProgressTitle" class="text-[10px] font-medium text-blue-200 leading-none">오늘 체크</span>
+        <span id="footerProgressText" class="text-xs font-extrabold mt-0.5 leading-none">0 / 0</span>
+      </button>
+
+      <button id="nextDayBtn" onclick="changeTab(1)" class="flex-1 flex items-center justify-center gap-1 py-3 px-2.5 rounded-2xl bg-[#C84B31] text-white font-bold text-xs sm:text-sm shadow-sm active:scale-[0.98] disabled:opacity-35 disabled:pointer-events-none transition">
+        <span id="nextDayLabel" class="truncate">다음</span>
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- 모달 1: 엔화 ↔ 원화 양방향 빠른 계산기 (100엔 = 900원 기준) -->
+  <div id="currencyModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45 backdrop-blur-xs" onclick="closeModalOnBackdrop(event, 'currencyModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">💴 엔화 ↔ 원화 빠른 계산기</h2>
+          <p class="text-xs text-stone-500 mt-0.5">여행 시트 적용 환율: 100엔 = 900원 (1엔 = 9원)</p>
+        </div>
+        <button onclick="closeModal('currencyModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- JPY 입력 -->
+        <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200">
+          <div class="flex items-center justify-between mb-1">
+            <label for="jpyInput" class="text-xs font-bold text-stone-500">일본 엔화 (JPY ¥)</label>
+            <button onclick="clearCurrency()" class="text-[11px] px-2 py-0.5 rounded-md bg-stone-200 text-stone-700 font-semibold">초기화</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold text-stone-400">¥</span>
+            <input id="jpyInput" type="number" inputmode="numeric" placeholder="엔화 입력 (예: 1500)" oninput="onJpyChange()" class="w-full bg-transparent text-2xl font-extrabold text-stone-900 focus:outline-none" />
+          </div>
+        </div>
+
+        <!-- 자주 쓰는 엔화 퀵 버튼 -->
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="addJpy(100)" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold active:scale-95">+100엔</button>
+          <button onclick="addJpy(500)" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold active:scale-95">+500엔</button>
+          <button onclick="addJpy(1000)" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold active:scale-95">+1,000엔</button>
+          <button onclick="addJpy(5000)" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold active:scale-95">+5,000엔</button>
+          <button onclick="addJpy(10000)" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold active:scale-95">+10,000엔</button>
+        </div>
+
+        <!-- KRW 양방향 입력 -->
+        <div class="bg-[#1E3A5F] text-white p-3.5 rounded-2xl">
+          <label for="krwInput" class="block text-xs font-medium text-blue-200 mb-1">대한민국 원화 (KRW ₩ · 직접 입력 가능)</label>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold text-blue-300">₩</span>
+            <input id="krwInput" type="number" inputmode="numeric" placeholder="원화 입력 (예: 9000)" oninput="onKrwChange()" class="w-full bg-transparent text-2xl font-extrabold text-white placeholder-blue-300/50 focus:outline-none" />
+            <span class="text-sm font-bold text-blue-100 shrink-0">원</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 2: Google 시트 연동 설정 & 공유 안내 -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45 backdrop-blur-xs" onclick="closeModalOnBackdrop(event, 'syncModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[88vh] overflow-y-auto" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">⚙️ Google 시트 실시간 연동 설정</h2>
+          <p class="text-xs text-stone-500 mt-0.5">시트를 수정하고 새로고침하면 웹앱에 즉시 반영됩니다</p>
+        </div>
+        <button onclick="closeModal('syncModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <!-- 현재 연동 상태 박스 -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700">현재 데이터 소스</span>
+            <span id="modalSyncStatus" class="font-extrabold text-[#1E3A5F]">확인 중...</span>
+          </div>
+          <div class="flex items-center justify-between mt-1.5 text-stone-500">
+            <span>마지막 동기화</span>
+            <span id="modalSyncTime">-</span>
+          </div>
+        </div>
+
+        <!-- 시트 ID 입력 및 변경 -->
+        <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
+          <label for="sheetIdInput" class="block font-extrabold text-stone-800">연동할 Google 스프레드시트 ID</label>
+          <input id="sheetIdInput" type="text" class="w-full px-3 py-2.5 rounded-xl bg-white border border-stone-300 text-xs font-mono text-stone-800 focus:outline-none focus:border-[#1E3A5F]" placeholder="시트 ID 입력" />
+          <div class="flex gap-2 pt-1">
+            <button onclick="saveSheetIdAndSync()" class="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white font-bold active:scale-98 transition">
+              저장 후 즉시 동기화
+            </button>
+            <button onclick="resetDefaultSheetId()" class="px-3 py-2.5 rounded-xl bg-stone-200 text-stone-700 font-bold active:scale-98 transition">
+              기본값 복원
+            </button>
+          </div>
+        </div>
+
+        <!-- Google 시트 공유 권한 설정 안내 -->
+        <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/90 space-y-1.5 text-amber-950">
+          <div class="font-extrabold text-amber-900 flex items-center gap-1.5">
+            <span>🔓</span>
+            <span>실시간 연동이 안 될 때 확인사항 (필수)</span>
+          </div>
+          <p class="leading-relaxed text-amber-900/90">
+            GitHub Pages 웹앱에서 Google 시트를 읽어오려면 시트 공유 권한이 열려 있어야 합니다:
+          </p>
+          <ol class="list-decimal pl-4 space-y-1 text-amber-950 font-medium">
+            <li>Google 시트 우측 상단 <strong>[공유]</strong> 버튼 클릭</li>
+            <li>일반 액세스를 <strong>'링크가 있는 모든 사용자'</strong>로 변경</li>
+            <li>역할을 <strong>'뷰어'</strong>로 설정 후 완료</li>
+            <li>웹앱 상단의 <strong>🔄 새로고침</strong> 버튼 터치</li>
+          </ol>
+        </div>
+
+        <!-- 연동 탭 매핑 구조 안내 -->
+        <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-1 text-stone-700">
+          <div class="font-extrabold text-indigo-950">📊 자동 연동되는 4개 시트 탭</div>
+          <p>• <strong>여행 일정표</strong> (B~G열: 일차, 날짜, 주요 일정, 요약, 숙소, 교통편)</p>
+          <p>• <strong>일차별 유의사항 및 팁</strong> (B~G열: 핵심 팁, 환승 팁, 입장료, 체크리스트)</p>
+          <p>• <strong>일정 점검 및 대안</strong> (B~F열: 체력 부담도, 정밀 진단, 플랜 B 대안)</p>
+          <p>• <strong>여행 준비물</strong> (B~G열: 카테고리, 항목, 수량, 패킹 팁, 체크 상태)</p>
+        </div>
+
+        <!-- 캐시 및 로컬 체크 초기화 -->
+        <div class="flex gap-2 pt-1">
+          <button onclick="clearCachedSheetData()" class="flex-1 py-2.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 font-bold">
+            시트 캐시 비우기
+          </button>
+          <button onclick="openSheetInNewTab()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-center">
+            원본 시트 열기 ↗
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-opacity duration-200">
+    <div id="toastMsg" class="px-4 py-2 rounded-full bg-stone-900/90 text-white text-xs font-semibold shadow-lg whitespace-nowrap">
+      완료되었습니다
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. 기본 설정 및 스토리지 키 정의
+    // =========================================================================
+    const DEFAULT_SHEET_ID = "11YkJKh9m4RHPTax-AEnu0p99HEwmZSefYSrTzIOCdOw";
+    const SHEET_TABS = {
+      SCHEDULE: "여행 일정표",
+      TIPS: "일차별 유의사항 및 팁",
+      DIAGNOSIS: "일정 점검 및 대안",
+      PACKING: "여행 준비물"
+    };
+
+    const STORAGE_KEYS = {
+      SHEET_ID: "ko_trip_sheet_id_v2",
+      CACHED_DATA: "ko_trip_cached_payload_v2",
+      LAST_SYNC: "ko_trip_last_sync_v2",
+      ACTIVE_TAB: "ko_trip_active_tab_v2",
+      CHECKS: "ko_trip_checks_v2",
+      STEPS: "ko_trip_steps_v2",
+      PACKING_CHECKS: "ko_trip_packing_checks_v2",
+      ACCORDION: "ko_trip_accordion_v2"
+    };
+
+    // =========================================================================
+    // 2. 오프라인/최초 접속용 기본 내장 데이터 (시트 데이터 폴백)
+    // =========================================================================
+    const FALLBACK_DAYS = [
+      {
+        day: 1,
+        dayLabel: "1일차",
+        dateLabel: "1/10 (일)",
+        shortDate: "1/10(일)",
+        region: "간사이 → 교토",
+        title: "간사이 입국(15:30) & 교토 이동 · 대욕장 휴식",
+        summary: "간사이공항 도착(15:30) → 하루카 특급 이동 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
+        routeText: "간사이공항 도착(15:30) → 무인 발권기 하루카 지정석 교환 및 교토역 이동 → 교토역 창구 자녀 어린이용 교통카드 발급 → 교토역 앞 택시 탑승 및 호텔 직행 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
+        hotel: "게이오 프렐리아 호텔 교토 가라스마 고조",
+        transport: "하루카 특급열차 + 교토역→호텔 택시",
+        fatigueLevel: "낮음",
+        coreTips: [
+          "15:30 간사이공항 도착 후 긴 유인 매표소 줄 대신 여권 마크가 부착된 녹색/흰색 무인 발권기에서 미리 예매한 하루카 QR코드를 스캔해 지정석 교환 (전원 실물 여권 필수)",
+          "게이오 프렐리아 호텔 체크인 후 대욕장에서 여독 풀기 (편안한 실내복/양말 지참)"
+        ],
+        transitTips: [
+          "하루카 특급열차: 대형 캐리어 보관 선반 이용을 위해 객실 출입문 맨 앞열 또는 맨 뒷열 좌석 지정 추천",
+          "교토역→호텔 이동: 30번 승강장 하차 후 중앙 개찰구로 나와 역 앞 택시 승강장에서 택시로 호텔 직행 (약 5분, 약 800엔 / 캐리어 소지 시 지하철 고조역 환승보다 훨씬 편하고 빠름)"
+        ],
+        ticketTips: [
+          "[어린이 교통카드] 교토역 창구에서 자녀 여권+현금 2,000엔(보증금 500+충전 1,500)으로 '어린이용 실물 Suica(또는 ICOCA)' 발급 (전 일정 대중교통 운임 약 1,970엔으로, 4·5일차 잔액 부족 시 오사카 지하철역 발매기에서 1,000엔 추가 충전)",
+          "성인 모바일 Suica: 애플페이 Suica 1인당 4,000엔 사전 충전 완료"
+        ],
+        diagnosis: "입국 및 장거리 이동 후 관광 일정을 배제하고 호텔 체크인 및 대욕장 휴식으로 연결하여 초반 컨디션 유지에 최적화됨. 단, 비행기 지연, 입국 심사 대기, 하루카 발권 대기열 등에 따라 교토 도착 및 저녁 식사 타이밍이 지연될 수 있는 변수 존재.",
+        alternatives: [
+          "간사이공항 도착 즉시 무인 여권 발권기에서 하루카 지정석 빠르게 교환.",
+          "교토역 도착 후 지하철 환승 대신 역 앞 택시로 호텔 직행(약 5분, 800엔 내외).",
+          "도착이 늦어지면 무리한 외식보다 호텔 앞 편의점 또는 교토역 델리 도시락 활용."
+        ],
+        checklist: [
+          "전원 실물 여권 (발권기 스캔 및 어린이 교통카드 발급용)",
+          "Visit Japan Web 입국심사·세관신고 QR 스크린샷",
+          "항공권 E-티켓 & 게이오 프렐리아 호텔 바우처",
+          "하루카 특급열차 모바일 예매 내역 (QR코드)",
+          "초기 필수 현금 약 10,000~12,000엔 (1,000엔권 위주, 어린이 교통카드 발급·충전분 포함)",
+          "토스뱅크 체크카드 (세븐은행 ATM 수수료 무료 출금용)",
+          "성인 애플페이 Suica 4,000엔 충전 확인 & 대욕장용 실내복"
+        ]
+      },
+      {
+        day: 2,
+        dayLabel: "2일차",
+        dateLabel: "1/11 (월)",
+        shortDate: "1/11(월)",
+        region: "교토 핵심 투어",
+        title: "청수사(기요미즈데라) & 아라시야마",
+        summary: "오전 기요미즈데라(청수사)·산넨자카 → 란덴 전철 → 오후 아라시야마(치쿠린·도게츠교) & 대욕장 휴식",
+        routeText: "호텔 출발(택시) → 기요미즈데라(청수사) 및 산넨자카 관람 → 점심 식사 → 택시로 란덴 시조오미야역 직행(약 10분) → 란덴 노면전철 탑승 및 아라시야마 이동 → 치쿠린(대나무숲) & 도게츠교 산책 → JR 사가아라시야마역 → 교토역 → 지하철 고조역(호텔 복귀 & 대욕장)",
+        hotel: "게이오 프렐리아 호텔 교토 가라스마 고조",
+        transport: "교토 시내 택시 + 란덴 전철 + [호텔 복귀] JR 사가노선 & 교토 지하철 가라스마선",
+        fatigueLevel: "중 ~ 높음",
+        coreTips: [
+          "기요미즈데라(청수사) 오르막길(산넨자카·니넨자카)은 오전 9시 전후 이른 시간에 방문해야 혼잡을 피하고 여유롭게 관람 가능",
+          "[란덴 전철 탑승 꿀팁] 시조오미야역은 란덴의 시발역이므로 이미 도착한 열차 좌석이 찼다면 배차 간격(약 10분)이 짧으니 다음 열차 줄 맨 앞에 서서 앉아서 이동 추천",
+          "오후 아라시야마(치쿠린 대나무숲·도게츠교) 산책 후 호텔 대욕장에서 피로 회복"
+        ],
+        transitTips: [
+          "도보 및 체력 소모 최소화를 위해 호텔↔기요미즈데라 이동 시 단거리 택시 적극 활용 (3인 가족 탑승 시 시영버스 대비 시간·체력 절약, 버스 1일권 구매 불필요)",
+          "[청수사→아라시야마 최적 환승 동선] 청수사(고조자카)에서 만원인 207번 버스 대신 택시로 란덴 시조오미야역까지 직행(약 10분)하여 노면전철 탑승",
+          "[아라시야마→호텔 복귀] JR 사가아라시야마역(사가노선) → 교토역 이동 후 교토 시영지하철 가라스마선 환승 → 고조역 하차 (호텔 도보 1분)"
+        ],
+        ticketTips: [
+          "기요미즈데라 입장료: 성인 500엔×2 + 초등학생 200엔 = 3인 총 1,200엔 (현장 매표소 현금 발권)",
+          "란덴(게이후쿠 전철) 운임: 균일 요금 성인 250엔, 초등학생 120엔 (3인 가족 편도 620엔 / Suica·ICOCA 교통카드 태그)"
+        ],
+        diagnosis: "교토 동쪽(기요미즈데라)에서 서쪽(아라시야마)으로 이동하는 장거리 횡단 코스로 경사로 도보량이 상당함. 1월 교토는 17시경 일몰 후 기온이 급격히 떨어지므로 아라시야마 체류 길이에 따라 저녁 귀가 체력이 크게 좌우됨.",
+        alternatives: [
+          "청수사 관람 후 207번 버스 대신 택시로 란덴 시조오미야역까지 직행(10분)해 피로 차단.",
+          "[오후 컷오프 규칙] 16시경 JR 사가아라시야마역 복귀 목표. 체력 저하 시 치쿠린 안쪽 깊숙이 들어가지 않고 도게츠교~란덴역(족욕탕·간식) 산책 후 조기 복귀."
+        ],
+        checklist: [
+          "사찰 매표소용 엔화 현금 (지폐/동전)",
+          "자녀 어린이용 교통카드 & 성인 모바일 Suica (란덴 전철·JR·지하철 태그용)",
+          "발 편한 워킹화/운동화 (산넨자카 경사로 대비)",
+          "방한 외투, 목도리, 장갑, 핫팩 (아라시야마 강바람 및 일몰 후 기온 하강 대비)"
+        ]
+      },
+      {
+        day: 3,
+        dayLabel: "3일차",
+        dateLabel: "1/12 (화)",
+        shortDate: "1/12(화)",
+        region: "교토 → 오사카",
+        title: "후시미 이나리 · 우지 · 도톤보리 크루즈",
+        summary: "후시미 이나리 신사 → 우지(뵤도인·말차 거리) → JR 신쾌속 오사카 이동 → 난바 코코호텔 체크인 & 도톤보리 크루즈·돈키호테 1차 쇼핑",
+        routeText: "호텔 체크아웃 & 택시 교토역 이동(코인락커 짐 보관) → JR 나라선 후시미 이나리 신사 관람(60분) → JR 나라선 우지 뵤도인 & 말차 거리 점심 → 교토역 복귀 및 짐 회수 → JR 신쾌속(오사카) + 미도스지선(난바) → 난바 코코호텔 체크인 → 도톤보리 저녁·톤보리 리버 크루즈 & 돈키호테 1차 쇼핑",
+        hotel: "난바 코코호텔 (3박)",
+        transport: "호텔→교토역 택시 + JR 나라선 + JR 신쾌속 + [호텔 이동] 오사카 메트로 미도스지선",
+        fatigueLevel: "높음 (여행 중 핵심 고비의 날)",
+        coreTips: [
+          "체크아웃 후 호텔 앞에서 택시로 교토역 이동(약 5분, 약 800엔), 코인락커에 대형 캐리어 보관 후 가볍게 이동",
+          "[후시미 이나리 신사 관람 팁] 산 정상까지 왕복 시 2시간 이상 소요되므로 '본전 → 천본 도리이 → 오쿠샤 봉배소(소원 돌 오모카루 이시 체험) → 여우 에마' 코스로 핵심만 60분 내외 관람 추천",
+          "우지 뵤도인 관람 및 말차 거리에서 말차 디저트·점심 식사",
+          "저녁 도톤보리 톤보리 리버 크루즈 탑승 및 '돈키호테 난바센니치마에점' 1차 쇼핑 (전원 여권 지참 시 면세 가능)"
+        ],
+        transitTips: [
+          "[JR 나라선 일직선 황금 동선] 교토역(8~10번 승강장)에서 JR 나라선 보통열차 탑승(2정거장, 약 5분) → JR 이나리역 하차(출구 바로 앞이 신사 입구) → 관람 후 JR 이나리역에서 나라선 탑승(약 20분) → JR 우지역 하차 후 도보 10분 뵤도인 도착 → 복귀 시 JR 우지역에서 쾌속/보통 탑승해 교토역 직행",
+          "[교토→오사카 이동] 교토역 코인락커 짐 회수 후 JR 신쾌속 열차로 오사카(우메다)역 이동 → 오사카 메트로 미도스지선 환승 → 난바역 하차(엘리베이터 동선 이용) 후 난바 코코호텔 체크인"
+        ],
+        ticketTips: [
+          "후시미 이나리 신사: 경내 무료 입장",
+          "우지 뵤도인(평등원): 정원+호쇼칸 박물관 입장료 성인 700엔, 초·중학생 300엔 (3인 가족 합계 1,700엔, 현장 매표소 발권)",
+          "톤보리 리버 크루즈: 성인 2,000엔, 초등학생 1,000엔 (현장 매표소 발권/교환)"
+        ],
+        diagnosis: "전체 5박 6일 중 체력 소모 및 이동 누적도가 가장 큰 핵심 고비의 날. 체크아웃·코인락커 짐 보관·후시미 이나리 도보·우지 도보·오사카 이동·체크인·크루즈·1차 쇼핑이 한데 집약됨.",
+        alternatives: [
+          "[대안 A (시간·휴식 확보)] 후시미 이나리는 '오쿠샤 봉배소'까지만 짧게 관람(60분 컷). 오후 이른 시간 오사카 이동 후 코코호텔 체크인 & 30~60분 침대 휴식 확보 후 19~20시 크루즈 탑승.",
+          "[대안 B (체력 세이브형)] 피로 누적 시 저녁 크루즈는 생략하고 도톤보리 글리코상 인증샷 및 가벼운 저녁 식사·산책만 진행."
+        ],
+        checklist: [
+          "난바 코코호텔 예약 바우처",
+          "교토역 코인락커용 100엔 동전 (약 700~900엔)",
+          "교통카드 잔액 확인 (JR 나라선·신쾌속·미도스지선)",
+          "뵤도인 입장료 및 말차 간식용 엔화 현금",
+          "톤보리 크루즈 매표소용 엔화 현금/결제카드 및 야간 강바람 대비 방한 외투/핫팩",
+          "쇼핑 면세용 전원 실물 여권 & 접이식 에코백"
+        ]
+      },
+      {
+        day: 4,
+        dayLabel: "4일차",
+        dateLabel: "1/13 (수)",
+        shortDate: "1/13(수)",
+        region: "오사카 북부·중부",
+        title: "컵누들뮤지엄 · 과학관 · 우메다 야경",
+        summary: "오전 컵누들뮤지엄(마이 컵누들 팩토리) → 오후 국립국제미술관 & 시립 과학관 → 저녁 우메다 야경 & 돈키호테 2차 면세 쇼핑",
+        routeText: "난바역(미도스지선) → 한큐 오사카우메다역(다카라즈카선) → 이케다역 하차 및 컵누들뮤지엄 체험 → 오사카우메다역 복귀 및 점심 → 나카노시마 이동(국립국제미술관 & 오사카시립 과학관) → 저녁 우메다 스카이빌딩 공중정원 야경 & 돈키호테 우메다 본점 2차 쇼핑 → 미도스지선 난바 코코호텔 복귀",
+        hotel: "난바 코코호텔",
+        transport: "오사카 메트로 미도스지선·요쓰바시선 + 한큐 다카라즈카선 + [호텔 복귀] 미도스지선 직행",
+        fatigueLevel: "중 ~ 높음 (실내 위주)",
+        coreTips: [
+          "수요일은 컵누들뮤지엄(화요 휴관) 및 오사카시립 과학관·국립국제미술관(월요 휴관) 모두 정상 개관일",
+          "[마이 컵누들 팩토리 체험] 컵라면 용기 디자인 후 원하는 수프 1종과 토핑 4종을 직접 골라 포장하는 컵라면 만들기 체험 필수 참여 (1인 500엔, 현장 키오스크 티켓 구입)",
+          "오후 나카노시마 오사카시립 과학관 플라네타리움 상영 시간 도착 즉시 확인 및 발권",
+          "저녁 우메다 스카이빌딩 공중정원 옥상 야외 전망대 관람 후 돈키호테 우메다 본점에서 본격 2차 면세 쇼핑"
+        ],
+        transitTips: [
+          "[오전 컵누들뮤지엄 이동] 난바역(미도스지선) → 우메다역 환승(3인 600엔) → 한큐 오사카우메다역에서 한큐 다카라즈카선(급행 약 20분, 3인 700엔) 탑승 → 이케다역 마스미초 방면 출구 도보 5분 (전 구간 평지·엘리베이터)",
+          "[오후 우메다/나카노시마 이동] 이케다역 → 한큐 오사카우메다역 복귀 후 점심 식사 → 요쓰바시선 니시우메다역 → 히고바시역 하차 후 도보 이동(나카노시마)",
+          "[호텔 복귀] 미도스지선 우메다역 탑승 → 난바역 직행 복귀"
+        ],
+        ticketTips: [
+          "컵누들뮤지엄 오사카 이케다: 입장료 무료 / '마이 컵누들 팩토리' 체험비 1인 500엔(현장 자판기 티켓 구입, 3인 1,500엔)",
+          "오사카시립 과학관: 상설전시 초·중학생 무료, 성인 400엔 / 플라네타륨 성인 600엔, 초등 300엔 (현장 무인기/매표소 발권)",
+          "국립국제미술관: 소장품전 기준 성인 430엔, 초·중학생 무료 (특별전 별도)",
+          "우메다 스카이빌딩 공중정원 전망대: 성인 2,000엔, 초등학생 500엔"
+        ],
+        diagnosis: "난바 ↔ 이케다 ↔ 우메다 ↔ 나카노시마 등 환승 및 이동 반경이 넓고 저녁 야경·식사·쇼핑까지 길게 이어짐. 다만 실내 체험 및 전시(과학관·전망대) 위주라 경사로 및 야외 칼바람 노출 부담은 2~3일차 대비 덜함.",
+        alternatives: [
+          "오전 컵누들뮤지엄 체험을 11:30경 신속히 마무리해 점심 이동 여유 확보.",
+          "오후 나카노시마에서는 아이의 흥미에 맞춰 오사카시립 과학관에 집중 관람(국립국제미술관은 가볍게 둘러보거나 유연 축소).",
+          "저녁 돈키호테 우메다 본점 2차 쇼핑은 체력 잔여량에 따라 짧게 진행하거나 3일차 쇼핑으로 대체 가능."
+        ],
+        checklist: [
+          "전원 실물 여권 (돈키호테 면세 결제 필수)",
+          "교통카드 잔액 충전 (필요 시 오사카 지하철역 발매기에서 어린이 카드 1,000엔 충전)",
+          "컵누들 체험비 및 과학관 발권용 엔화 현금/결제카드",
+          "우메다 스카이빌딩 옥상 야경 관람용 방한 외투/장갑/목도리",
+          "돈키호테 5% 추가 모바일 할인쿠폰 & 대용량 접이식 장바구니/에코백"
+        ]
+      },
+      {
+        day: 5,
+        dayLabel: "5일차",
+        dateLabel: "1/14 (목)",
+        shortDate: "1/14(목)",
+        region: "오사카 동부·항만",
+        title: "오사카성 · 해유관(수족관) · 덴포잔",
+        summary: "오전 오사카성(천수각·성곽 산책) → 오후 해유관(수족관) & 덴포잔 대관람차 야경 → 도톤보리 저녁 식사",
+        routeText: "난바역(센니치마에선) → 다니마치9초메 환승 → 다니마치욘초메역 9번 출구 → 오사카성 공원(로드 트레인) 및 천수각 관람 → 모리노미야역 방면 점심 식사 → 모리노미야역(주오선 직행) → 오사카코역 하차 및 해유관(수족관) 관람 → 덴포잔 마켓플레이스 & 덴포잔 대관람차 야경 → 주오선·미도스지선 난바 코코호텔 복귀 & 도톤보리 저녁",
+        hotel: "난바 코코호텔",
+        transport: "오사카 메트로(다니마치선·주오선) + [호텔 복귀] 주오선·미도스지선 환승",
+        fatigueLevel: "보통 ~ 중",
+        coreTips: [
+          "[오사카성 천수각 관람 팁] 넓은 오사카성 공원 도보 피로를 줄이기 위해 로드 트레인(공원 순환 미니열차, 편도 성인 400엔/어린이 200엔) 활용 추천. 천수각 내부는 5층까지 엘리베이터로 올라간 후 8층 전망대까지 관람하고 계단으로 내려오는 동선 권장",
+          "[점심 식사 팁] 오사카성 관람 후 모리노미야역 방면(큐즈몰 등)으로 이동해 식사하면 오후 주오선 해유관 직행 동선과 자연스럽게 연결됨",
+          "오후 해유관 입장 시간대 예약 맞춰 입장 후 덴포잔 마켓플레이스 간식 및 덴포잔 대관람차 야경 감상"
+        ],
+        transitTips: [
+          "[오전 오사카성 이동] 난바역(센니치마에선) 탑승 → 다니마치9초메역 환승(다니마치선) → 다니마치욘초메역 9번 출구(오사카성 방면 엘리베이터 완비) 하차 후 오사카성 공원 진입 (3인 600엔: 성인 240×2+초등 120)",
+          "[오후 해유관 이동 (주오선 직행!)] 점심 식사 후 모리노미야역에서 오사카 메트로 주오선 탑승 → 오사카코역 직행 하차 (환승 없이 약 20분)",
+          "[호텔 복귀] 오사카코역(주오선) → 혼마치역 환승(미도스지선) → 난바역 하차 후 도톤보리 저녁 식사 및 코코호텔 복귀"
+        ],
+        ticketTips: [
+          "오사카성 천수각 입장료: 성인 600엔, 중학생 이하 무료 (3인 가족 성인 2인 1,200엔 / 현장 매표소 발권 또는 공식 웹티켓 예매, 공원 로드 트레인 편도 성인 400엔·어린이 200엔)",
+          "해유관 입장료: 성인 2,700엔, 초등학생 1,400엔 (공식 웹티켓 사전 예매 QR 입장 필수)",
+          "덴포잔 대관람차: 1인 900엔 (3인 2,700엔, 현장 발권)"
+        ],
+        diagnosis: "오전 성곽 산책 후 오후에는 실내 수족관(해유관)과 관람차 탑승으로 이어져 균형 잡힌 코스. 다만 오사카성 공원 도보와 덴포잔 항만 바람 체감 온도를 고려해야 함.",
+        alternatives: [
+          "오사카성 공원 진입 시 로드 트레인 적극 활용해 도보 피로 최소화.",
+          "해유관 관람 후 피곤하거나 바닷바람이 강하면 덴포잔 대관람차는 생략하고 마켓플레이스에서 따뜻한 간식 후 일찍 난바로 복귀해 마지막 밤 휴식."
+        ],
+        checklist: [
+          "해유관 사전 예매 모바일 QR 바우처 (입장 시간 확인)",
+          "덴포잔 항만 바닷바람 대비 방한 외투/핫팩/목도리",
+          "어린이용 교통카드 & 성인 모바일 Suica / 해외 결제 카드",
+          "전날 쇼핑한 캐리어 짐 정리용 지퍼백/파우치"
+        ]
+      },
+      {
+        day: 6,
+        dayLabel: "6일차",
+        dateLabel: "1/15 (금)",
+        shortDate: "1/15(금)",
+        region: "오사카 → 귀국",
+        title: "난바 야사카 신사 산책 & 공항 리무진 귀국",
+        summary: "호텔 조식 후 난바 야사카 신사 산책 & 체크아웃 → 난바 OCAT 리무진버스 탑승 → 16:30 간사이공항 출발 귀국",
+        routeText: "호텔 조식 후 난바 야사카 신사(사자머리 본전) 가벼운 산책 → 11:00 체크아웃 및 수하물 최종 점검 → 호텔 앞 택시 탑승 및 난바 OCAT 이동(5~10분) → OCAT 2층 간사이공항 리무진버스 탑승 → 16:30 간사이공항 출발 귀국",
+        hotel: "귀국 (해당 없음)",
+        transport: "택시 + 간사이공항 리무진버스 (난바 OCAT → 간사이공항)",
+        fatigueLevel: "낮음",
+        coreTips: [
+          "오전에는 무리한 원거리 이동 대신 난바 코코호텔 도보권의 '난바 야사카 신사'(사자머리 본전) 가볍게 산책 및 기념사진 촬영",
+          "체크아웃(보통 11:00) 전 캐리어 무게 및 액체류·배터리 수하물 규정 최종 점검 (보조배터리 기내 휴대 필수)",
+          "16:30 출발 항공편이므로 최소 2시간 30분~3시간 전(13:30~14:00) 공항 도착 목표로 난바 OCAT에서 리무진버스 탑승"
+        ],
+        transitTips: [
+          "[호텔→공항 무계단 황금 루트] 난바 코코호텔에서 대형 캐리어를 끌고 지하철·난카이선 역사를 헤매는 대신, 호텔 앞에서 택시로 '난바 OCAT(오사카 시티 에어 터미널)'까지 이동(약 5~10분) 후 2층 리무진버스 터미널에서 간사이공항 직행 리무진버스 탑승 (짐을 버스 하단 트렁크에 싣고 공항 출발층 바로 앞 하차)"
+        ],
+        ticketTips: [
+          "난바 야사카 신사: 무료 입장",
+          "간사이공항 리무진버스(난바 OCAT → 간사이공항 제1터미널): 성인 1,300엔, 어린이 650엔 (3인 3,250엔 / OCAT 2층 자동발매기 또는 창구 발권)"
+        ],
+        diagnosis: "마지막 날 오전에 여유로운 동네 산책과 체크아웃 후 공항 리무진버스로 직행하는 편하고 안정적인 마무리 일정.",
+        alternatives: [
+          "비가 오거나 피곤하면 야사카 신사 산책을 생략하고 호텔에서 체크아웃 시간까지 푹 쉰 뒤 점심 식사 후 바로 OCAT으로 이동.",
+          "남은 동전·엔화 현금은 간사이공항 면세점/편의점에서 소진."
+        ],
+        checklist: [
+          "전원 실물 여권 & 귀국편 항공권 E-티켓",
+          "보조배터리 기내 휴대 및 면세품/액체류 위탁수하물 패킹 확인",
+          "남은 엔화 현금 및 동전 (리무진버스 운임 및 공항 간식용)",
+          "호텔 객실 내 충전기·110V 돼지코·귀중품 최종 확인"
+        ]
+      }
+    ];
+
+    const FALLBACK_PACKING = [
+      { id: "p_0", category: "필수 서류 · 결제", item: "전원 실물 여권", qty: "3인 전원", tip: "하루카 발권기 스캔, 어린이 교통카드 발급, 돈키호테 면세 시 필수 지참", sheetChecked: false },
+      { id: "p_1", category: "필수 서류 · 결제", item: "Visit Japan Web QR 코드", qty: "3인분", tip: "입국심사·세관신고 QR 스크린샷 앨범에 미리 저장", sheetChecked: false },
+      { id: "p_2", category: "필수 서류 · 결제", item: "엔화 현금 & 동전 지갑", qty: "약 3~4만엔", tip: "사찰 입장료, 100엔 코인락커, 어린이 교통카드 발급/충전용 천엔권 위주", sheetChecked: false },
+      { id: "p_3", category: "필수 서류 · 결제", item: "트래블로그 / 토스뱅크 카드", qty: "2장", tip: "세븐은행 ATM 수수료 무료 출금 및 백업 결제용", sheetChecked: false },
+      { id: "p_4", category: "교통 · 패스 · 예약", item: "하루카 특급열차 예매 QR", qty: "성인2 + 초등1", tip: "간사이공항 녹색/흰색 여권 무인 발권기에서 지정석 교환", sheetChecked: false },
+      { id: "p_5", category: "교통 · 패스 · 예약", item: "해유관 웹티켓 QR 바우처", qty: "성인2 + 초등1", tip: "5일차 지정 입장 시간 확인 필수", sheetChecked: false },
+      { id: "p_6", category: "교통 · 패스 · 예약", item: "성인 애플페이 Suica 충전", qty: "각 4,000엔", tip: "출국 전 아이폰 지갑 앱에서 사전 충전 완료", sheetChecked: false },
+      { id: "p_7", category: "의류 · 방한용품", item: "방한 외투 · 목도리 · 장갑", qty: "3인 전원", tip: "1월 교토(아라시야마)·덴포잔 항만 바람 및 우메다 야외 전망대 대비", sheetChecked: false },
+      { id: "p_8", category: "의류 · 방한용품", item: "붙이는/손난로 핫팩", qty: "15~20개", tip: "일몰 후 야외 이동 시 유용 (귀국 시 위탁수하물 규정 확인)", sheetChecked: false },
+      { id: "p_9", category: "전자 · 생활 · 아이용", item: "110V 돼지코 어댑터 & 멀티탭", qty: "2개", tip: "아이폰·애플워치·보조배터리 동시 충전용", sheetChecked: false },
+      { id: "p_10", category: "전자 · 생활 · 아이용", item: "보조배터리 (기내 휴대 필수)", qty: "2개", tip: "구글맵·파파고·웹앱 사용량 많음, 위탁수하물 절대 금지", sheetChecked: false },
+      { id: "p_11", category: "전자 · 생활 · 아이용", item: "접이식 장바구니 · 지퍼백", qty: "넉넉히", tip: "돈키호테 면세 쇼핑 및 마이 컵누들(2~3개) 파손 방지 포장용", sheetChecked: false }
+    ];
+
+    // =========================================================================
+    // 3. 애플리케이션 전역 상태
+    // =========================================================================
+    let state = {
+      sheetId: DEFAULT_SHEET_ID,
+      days: JSON.parse(JSON.stringify(FALLBACK_DAYS)),
+      packing: JSON.parse(JSON.stringify(FALLBACK_PACKING)),
+      activeTab: 0, // 0~5: Day 1~6, 6: 전체 준비물 탭
+      packingCategoryFilter: "전체",
+      syncMode: "loading", // 'live' | 'cache' | 'fallback' | 'loading'
+      lastSyncTime: null,
+      checks: {},        // { "d1_c0": true }
+      steps: {},         // { "d1_s0": true }
+      packingChecks: {}, // { "p_0": true }
+      accordion: {
+        timeline: true,
+        coreTips: true,
+        transitTips: true,
+        ticketTips: false,
+        diagnosis: false
+      }
+    };
+
+    // =========================================================================
+    // 4. 로컬 스토리지 저장 및 불러오기
+    // =========================================================================
+    function loadLocalState() {
+      try {
+        const savedSheetId = localStorage.getItem(STORAGE_KEYS.SHEET_ID);
+        if (savedSheetId && savedSheetId.trim()) state.sheetId = savedSheetId.trim();
+
+        const savedTab = localStorage.getItem(STORAGE_KEYS.ACTIVE_TAB);
+        if (savedTab !== null) {
+          const parsed = parseInt(savedTab, 10);
+          if (parsed >= 0 && parsed <= 6) state.activeTab = parsed;
+        }
+
+        const savedChecks = localStorage.getItem(STORAGE_KEYS.CHECKS);
+        if (savedChecks) state.checks = JSON.parse(savedChecks);
+
+        const savedSteps = localStorage.getItem(STORAGE_KEYS.STEPS);
+        if (savedSteps) state.steps = JSON.parse(savedSteps);
+
+        const savedPackingChecks = localStorage.getItem(STORAGE_KEYS.PACKING_CHECKS);
+        if (savedPackingChecks) state.packingChecks = JSON.parse(savedPackingChecks);
+
+        const savedAcc = localStorage.getItem(STORAGE_KEYS.ACCORDION);
+        if (savedAcc) state.accordion = { ...state.accordion, ...JSON.parse(savedAcc) };
+
+        // 이전 성공 캐시가 있으면 우선 복원
+        const cachedPayload = localStorage.getItem(STORAGE_KEYS.CACHED_DATA);
+        const lastSync = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
+        if (cachedPayload) {
+          const parsedCache = JSON.parse(cachedPayload);
+          if (parsedCache.days && parsedCache.days.length === 6) {
+            state.days = parsedCache.days;
+          }
+          if (parsedCache.packing && parsedCache.packing.length > 0) {
+            state.packing = parsedCache.packing;
+          }
+          state.syncMode = "cache";
+          state.lastSyncTime = lastSync || null;
+        } else {
+          state.syncMode = "fallback";
+        }
+      } catch (e) {
+        console.warn("로컬 상태 복원 오류:", e);
+      }
+    }
+
+    function saveLocalPreferences() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.SHEET_ID, state.sheetId);
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_TAB, String(state.activeTab));
+        localStorage.setItem(STORAGE_KEYS.CHECKS, JSON.stringify(state.checks));
+        localStorage.setItem(STORAGE_KEYS.STEPS, JSON.stringify(state.steps));
+        localStorage.setItem(STORAGE_KEYS.PACKING_CHECKS, JSON.stringify(state.packingChecks));
+        localStorage.setItem(STORAGE_KEYS.ACCORDION, JSON.stringify(state.accordion));
+      } catch (e) {
+        console.warn("로컬 저장 오류:", e);
+      }
+    }
+
+    // =========================================================================
+    // 5. Google Sheets gviz API 실시간 Fetch 및 파싱 엔진
+    // =========================================================================
+    function buildGvizUrl(sheetId, tabName) {
+      return `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}`;
+    }
+
+    function parseGvizResponseText(rawText) {
+      // Google gviz 응답: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+      const startIdx = rawText.indexOf("{");
+      const endIdx = rawText.lastIndexOf("}");
+      if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+        throw new Error("유효한 gviz JSON 응답이 아닙니다.");
+      }
+      const jsonStr = rawText.substring(startIdx, endIdx + 1);
+      const parsed = JSON.parse(jsonStr);
+      if (parsed.status === "error") {
+        throw new Error(parsed.errors?.[0]?.detailed_message || "Google 시트 쿼리 오류");
+      }
+      return parsed.table;
+    }
+
+    function getCellText(row, colIndex) {
+      if (!row || !row.c || !row.c[colIndex]) return "";
+      const cell = row.c[colIndex];
+      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") {
+        return String(cell.f).trim();
+      }
+      if (cell.v !== undefined && cell.v !== null) {
+        return String(cell.v).trim();
+      }
+      return "";
+    }
+
+    function getCellBool(row, colIndex) {
+      if (!row || !row.c || !row.c[colIndex]) return false;
+      const cell = row.c[colIndex];
+      if (typeof cell.v === "boolean") return cell.v;
+      const str = String(cell.v ?? "").trim().toUpperCase();
+      return str === "TRUE" || str === "O" || str === "Y" || str === "완료";
+    }
+
+    // 텍스트를 줄바꿈 또는 불릿(•, -, ▪) 기준으로 배열 분리
+    function splitMultilineItems(text) {
+      if (!text) return [];
+      return text
+        .split(/\r?\n/)
+        .map(line => line.replace(/^[\s•·▪\-*]+/, "").trim())
+        .filter(line => line.length > 0 && line !== "-" && line !== "없음");
+    }
+
+    // 동선 텍스트를 '→' 또는 줄바꿈 기준으로 단계 분리
+    function splitRouteSteps(text) {
+      if (!text) return [];
+      // 줄바꿈과 '→' 모두 고려하여 깔끔한 단계 배열 생성
+      const rawParts = text.includes("→")
+        ? text.split(/\s*→\s*|\r?\n+/)
+        : text.split(/\r?\n+/);
+      return rawParts
+        .map(s => s.replace(/^[\s•·\-*\d.]+/, "").trim())
+        .filter(s => s.length > 1);
+    }
+
+    // '1일차', 'Day 1', '1' 등에서 1~6 숫자 추출
+    function extractDayNumber(str) {
+      if (!str) return null;
+      const match = String(str).match(/([1-6])\s*(?:일차|일|day)?/i);
+      if (match) {
+        // 해당 셀이 일차 표기 셀인지 검증 (예: '1일차', 'Day 1', '1')
+        if (/^(?:day\s*)?[1-6](?:일차|일)?$/i.test(String(str).trim())) {
+          return parseInt(match[1], 10);
+        }
+      }
+      return null;
+    }
+
+    async function fetchSingleTab(sheetId, tabName) {
+      const url = buildGvizUrl(sheetId, tabName);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 9000);
+      try {
+        const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        // 비공개 시트일 때 Google 로그인 HTML 페이지가 반환되는 경우 감지
+        if (text.trim().startsWith("<!DOCTYPE html") || text.includes("accounts.google.com")) {
+          throw new Error("PRIVATE_SHEET");
+        }
+        return parseGvizResponseText(text);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    }
+
+    async function syncFromGoogleSheet(isManual = false) {
+      const refreshIcon = document.getElementById("refreshIcon");
+      if (refreshIcon) refreshIcon.classList.add("spin-loading");
+
+      try {
+        const [scheduleRes, tipsRes, diagnosisRes, packingRes] = await Promise.allSettled([
+          fetchSingleTab(state.sheetId, SHEET_TABS.SCHEDULE),
+          fetchSingleTab(state.sheetId, SHEET_TABS.TIPS),
+          fetchSingleTab(state.sheetId, SHEET_TABS.DIAGNOSIS),
+          fetchSingleTab(state.sheetId, SHEET_TABS.PACKING)
+        ]);
+
+        const fulfilledCount = [scheduleRes, tipsRes, diagnosisRes, packingRes].filter(r => r.status === "fulfilled").length;
+
+        if (fulfilledCount === 0) {
+          // 4개 탭 모두 실패 시 (비공개 시트 또는 오프라인)
+          const firstReason = scheduleRes.reason?.message || "";
+          handleSyncFailure(firstReason, isManual);
+          return;
+        }
+
+        // 기존 데이터를 베이스로 복제 후 성공한 탭만 정교하게 병합
+        const mergedDays = JSON.parse(JSON.stringify(state.days));
+
+        // ① '여행 일정표' 파싱: B(1): 일차, C(2): 날짜, D(3): 주요 일정 및 동선, E(4): 간단 일정, F(5): 숙소, G(6): 이동 교통편
+        if (scheduleRes.status === "fulfilled" && scheduleRes.value?.rows) {
+          scheduleRes.value.rows.forEach(row => {
+            const dayNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
+            if (dayNum && dayNum >= 1 && dayNum <= 6) {
+              const target = mergedDays[dayNum - 1];
+              const dateVal = getCellText(row, 2);
+              const detailRoute = getCellText(row, 3);
+              const simpleSummary = getCellText(row, 4);
+              const hotelVal = getCellText(row, 5);
+              const transportVal = getCellText(row, 6);
+
+              if (dateVal) {
+                target.dateLabel = dateVal;
+                target.shortDate = dateVal.replace(/\s+/g, "");
+              }
+              if (simpleSummary) {
+                target.summary = simpleSummary;
+                target.title = simpleSummary.split("→")[0].trim() || simpleSummary;
+              }
+              if (detailRoute) {
+                target.routeText = detailRoute;
+                if (!simpleSummary) target.summary = detailRoute;
+              }
+              if (hotelVal) target.hotel = hotelVal;
+              if (transportVal) target.transport = transportVal;
+            }
+          });
+        }
+
+        // ② '일차별 유의사항 및 팁' 파싱: B(1): 일차, C(2): 일자 및 일정, D(3): 핵심 팁, E(4): 교통 환승 팁, F(5): 입장료/발권, G(6): 준비물/체크
+        if (tipsRes.status === "fulfilled" && tipsRes.value?.rows) {
+          const foundDaysInTips = new Set();
+          tipsRes.value.rows.forEach(row => {
+            const dayNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
+            if (dayNum && dayNum >= 1 && dayNum <= 6) {
+              foundDaysInTips.add(dayNum);
+              const target = mergedDays[dayNum - 1];
+              const dayTitle = getCellText(row, 2);
+              const coreRaw = getCellText(row, 3);
+              const transitRaw = getCellText(row, 4);
+              const ticketRaw = getCellText(row, 5);
+              const checkRaw = getCellText(row, 6);
+
+              if (dayTitle) {
+                // 예: "1/11(월) 청수사 & 아라시야마"에서 제목 추출
+                const cleanedTitle = dayTitle.replace(/^\d+\/\d+\s*\([^)]+\)\s*/, "").trim();
+                if (cleanedTitle) target.title = cleanedTitle;
+              }
+              const coreList = splitMultilineItems(coreRaw);
+              if (coreList.length > 0) target.coreTips = coreList;
+
+              const transitList = splitMultilineItems(transitRaw);
+              if (transitList.length > 0) target.transitTips = transitList;
+
+              const ticketList = splitMultilineItems(ticketRaw);
+              if (ticketList.length > 0) target.ticketTips = ticketList;
+
+              const checkList = splitMultilineItems(checkRaw);
+              if (checkList.length > 0) target.checklist = checkList;
+            }
+          });
+
+          // 6일차 행이 시트의 '일차별 유의사항 및 팁'에 없을 경우 안내 문구 보강
+          if (!foundDaysInTips.has(6)) {
+            mergedDays[5].tipsMissingNotice = "시트의 '일차별 유의사항 및 팁' 탭에는 1~5일차까지 작성되어 있어 기본 귀국 안내를 표시합니다.";
+          } else {
+            delete mergedDays[5].tipsMissingNotice;
+          }
+        }
+
+        // ③ '일정 점검 및 대안' 파싱: B(1): 일차, C(2): 날짜 및 행선지, D(3): 체력 부담도, E(4): 정밀 진단, F(5): 실전 대안
+        if (diagnosisRes.status === "fulfilled" && diagnosisRes.value?.rows) {
+          diagnosisRes.value.rows.forEach(row => {
+            const dayNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
+            if (dayNum && dayNum >= 1 && dayNum <= 6) {
+              const target = mergedDays[dayNum - 1];
+              const fatigueVal = getCellText(row, 3);
+              const diagVal = getCellText(row, 4);
+              const altRaw = getCellText(row, 5);
+
+              if (fatigueVal) target.fatigueLevel = fatigueVal;
+              if (diagVal) target.diagnosis = diagVal;
+              const altList = splitMultilineItems(altRaw);
+              if (altList.length > 0) target.alternatives = altList;
+            }
+          });
+        }
+
+        // ④ '여행 준비물' 파싱: B(1) 또는 G(6): 시트 체크 상태, C(2): 카테고리, D(3): 준비물 항목, E(4): 대상/수량, F(5): 세부 안내
+        let parsedPacking = state.packing;
+        if (packingRes.status === "fulfilled" && packingRes.value?.rows) {
+          const tempPacking = [];
+          let lastCategory = "기타 준비물";
+          packingRes.value.rows.forEach((row, idx) => {
+            const catCell = getCellText(row, 2);
+            const itemCell = getCellText(row, 3);
+            const qtyCell = getCellText(row, 4);
+            const tipCell = getCellText(row, 5);
+
+            // 헤더 행이나 요약 행 필터링
+            if (!itemCell || itemCell === "준비물 항목" || itemCell === "항목" || itemCell.includes("합계")) {
+              return;
+            }
+            if (catCell && catCell !== "카테고리") {
+              lastCategory = catCell;
+            }
+            const sheetChecked = getCellBool(row, 1) || getCellBool(row, 6);
+            tempPacking.push({
+              id: `sheet_p_${idx}`,
+              category: lastCategory,
+              item: itemCell,
+              qty: qtyCell || "-",
+              tip: tipCell || "",
+              sheetChecked
+            });
+          });
+          if (tempPacking.length > 0) {
+            parsedPacking = tempPacking;
+          }
+        }
+
+        // 동기화 성공 상태 반영 및 캐시 저장
+        const nowStr = formatKoreanDateTime(new Date());
+        state.days = mergedDays;
+        state.packing = parsedPacking;
+        state.syncMode = "live";
+        state.lastSyncTime = nowStr;
+
+        localStorage.setItem(STORAGE_KEYS.CACHED_DATA, JSON.stringify({
+          days: state.days,
+          packing: state.packing
+        }));
+        localStorage.setItem(STORAGE_KEYS.LAST_SYNC, nowStr);
+
+        document.getElementById("fallbackBanner").classList.add("hidden");
+        updateSyncStatusUI();
+        renderAll();
+
+        if (isManual) {
+          showToast("✅ Google 시트 최신 데이터로 동기화되었습니다.");
+        }
+      } catch (error) {
+        console.error("동기화 예외:", error);
+        handleSyncFailure(error.message, isManual);
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove("spin-loading");
+      }
+    }
+
+    function handleSyncFailure(reason, isManual) {
+      const hasCache = !!localStorage.getItem(STORAGE_KEYS.CACHED_DATA);
+      state.syncMode = hasCache ? "cache" : "fallback";
+      updateSyncStatusUI();
+      renderAll();
+
+      const banner = document.getElementById("fallbackBanner");
+      const bannerMsg = document.getElementById("fallbackBannerMsg");
+      banner.classList.remove("hidden");
+
+      if (reason === "PRIVATE_SHEET") {
+        bannerMsg.textContent = "시트가 비공개 상태입니다. 시트 [공유 → 링크가 있는 모든 사용자(뷰어)]로 설정해 주세요.";
+      } else {
+        bannerMsg.textContent = hasCache
+          ? "시트 연결이 원활하지 않아 마지막으로 동기화된 오프라인 캐시를 표시합니다."
+          : "시트 연결 전이므로 기본 내장 일정을 표시합니다. 시트 공유 권한을 확인해 주세요.";
+      }
+
+      if (isManual) {
+        showToast("⚠️ 시트에 접근할 수 없어 저장된 데이터를 유지합니다.");
+      }
+    }
+
+    function formatKoreanDateTime(date) {
+      const m = date.getMonth() + 1;
+      const d = date.getDate();
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mm = String(date.getMinutes()).padStart(2, "0");
+      return `${m}/${d} ${hh}:${mm}`;
+    }
+
+    function updateSyncStatusUI() {
+      const dot = document.getElementById("syncDot");
+      const text = document.getElementById("syncStatusText");
+      const timeText = document.getElementById("lastSyncTimeText");
+      const modalStatus = document.getElementById("modalSyncStatus");
+      const modalTime = document.getElementById("modalSyncTime");
+
+      if (state.syncMode === "live") {
+        dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500";
+        text.textContent = "실시간 시트 연동됨";
+        timeText.textContent = `마지막 동기화: ${state.lastSyncTime || "방금 전"}`;
+        if (modalStatus) modalStatus.textContent = "🟢 실시간 Google 시트 연동 중";
+      } else if (state.syncMode === "cache") {
+        dot.className = "w-1.5 h-1.5 rounded-full bg-amber-500";
+        text.textContent = "오프라인 캐시 사용 중";
+        timeText.textContent = `마지막 성공 동기화: ${state.lastSyncTime || "기록 없음"}`;
+        if (modalStatus) modalStatus.textContent = "🟡 오프라인 캐시 데이터";
+      } else {
+        dot.className = "w-1.5 h-1.5 rounded-full bg-slate-400";
+        text.textContent = "기본 내장 데이터";
+        timeText.textContent = "시트 공유 설정 후 🔄 새로고침을 눌러주세요";
+        if (modalStatus) modalStatus.textContent = "⚪ 기본 내장 데이터 (미연동)";
+      }
+
+      if (modalTime) modalTime.textContent = state.lastSyncTime || "아직 동기화 기록 없음";
+    }
+
+    // =========================================================================
+    // 6. UI 렌더링 함수 (탭 네비게이션 / 일차 상세 / 전체 준비물 탭)
+    // =========================================================================
+    function getFatigueBadgeStyle(levelText) {
+      const t = String(levelText || "");
+      if (t.includes("낮음")) {
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      }
+      if (t.includes("높음") && !t.includes("중")) {
+        return "bg-rose-100 text-rose-800 border-rose-200";
+      }
+      if (t.includes("중") || t.includes("높음")) {
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      }
+      return "bg-sky-100 text-sky-800 border-sky-200";
+    }
+
+    function renderTabs() {
+      const nav = document.getElementById("dayTabs");
+      const dayButtons = state.days.map((item, idx) => {
+        const isActive = state.activeTab === idx;
+        const total = item.checklist.length;
+        const done = item.checklist.filter((_, cIdx) => state.checks[`d${item.day}_c${cIdx}`]).length;
+        const isAllDone = total > 0 && done === total;
+
+        return `
+          <button
+            onclick="selectTab(${idx})"
+            id="tab-btn-${idx}"
+            class="shrink-0 px-3 py-2 rounded-2xl text-left transition-all duration-150 border ${
+              isActive
+                ? "bg-[#1E3A5F] text-white border-[#1E3A5F] shadow-sm"
+                : "bg-white text-stone-700 border-stone-200/90 hover:bg-stone-50"
+            }"
+          >
+            <div class="flex items-center gap-1">
+              <span class="text-xs font-extrabold tracking-tight">Day ${item.day}</span>
+              ${isAllDone ? `<span class="text-[10px]">✅</span>` : ""}
+            </div>
+            <div class="text-[10px] font-medium mt-0.5 ${isActive ? "text-blue-200" : "text-stone-400"}">
+              ${item.shortDate}
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      const isPackingActive = state.activeTab === 6;
+      const packingDoneCount = state.packing.filter(p => isPackingItemChecked(p)).length;
+      const packingTabBtn = `
+        <button
+          onclick="selectTab(6)"
+          id="tab-btn-6"
+          class="shrink-0 px-3.5 py-2 rounded-2xl text-left transition-all duration-150 border ${
+            isPackingActive
+              ? "bg-[#C84B31] text-white border-[#C84B31] shadow-sm"
+              : "bg-white text-stone-700 border-stone-200/90 hover:bg-stone-50"
+          }"
+        >
+          <div class="flex items-center gap-1">
+            <span class="text-xs font-extrabold tracking-tight">🎒 전체 준비물</span>
+          </div>
+          <div class="text-[10px] font-medium mt-0.5 ${isPackingActive ? "text-orange-100" : "text-stone-400"}">
+            ${packingDoneCount}/${state.packing.length} 완료
+          </div>
+        </button>
+      `;
+
+      nav.innerHTML = dayButtons + packingTabBtn;
+
+      const activeBtn = document.getElementById(`tab-btn-${state.activeTab}`);
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+
+    function renderAll() {
+      renderTabs();
+      if (state.activeTab === 6) {
+        renderPackingView();
+      } else {
+        renderDayView(state.activeTab);
+      }
+      updateFooterControls();
+    }
+
+    function updateFooterControls() {
+      const prevBtn = document.getElementById("prevDayBtn");
+      const nextBtn = document.getElementById("nextDayBtn");
+      const prevLabel = document.getElementById("prevDayLabel");
+      const nextLabel = document.getElementById("nextDayLabel");
+      const progressTitle = document.getElementById("footerProgressTitle");
+      const progressText = document.getElementById("footerProgressText");
+
+      prevBtn.disabled = state.activeTab === 0;
+      nextBtn.disabled = state.activeTab === 6;
+
+      if (state.activeTab === 0) {
+        prevLabel.textContent = "첫째 날";
+      } else if (state.activeTab === 6) {
+        prevLabel.textContent = "Day 6 보기";
+      } else {
+        prevLabel.textContent = `Day ${state.activeTab}`;
+      }
+
+      if (state.activeTab < 5) {
+        nextLabel.textContent = `Day ${state.activeTab + 2} 보기`;
+      } else if (state.activeTab === 5) {
+        nextLabel.textContent = "🎒 전체 준비물";
+      } else {
+        nextLabel.textContent = "마지막 탭";
+      }
+
+      if (state.activeTab === 6) {
+        const done = state.packing.filter(p => isPackingItemChecked(p)).length;
+        progressTitle.textContent = "전체 패킹";
+        progressText.textContent = `${done} / ${state.packing.length}`;
+      } else {
+        const dayObj = state.days[state.activeTab];
+        const done = dayObj.checklist.filter((_, idx) => state.checks[`d${dayObj.day}_c${idx}`]).length;
+        progressTitle.textContent = `Day ${dayObj.day} 체크`;
+        progressText.textContent = `${done} / ${dayObj.checklist.length}`;
+      }
+    }
+
+    // 일차별 상세 화면 렌더링
+    function renderDayView(dayIdx) {
+      const data = state.days[dayIdx];
+      const main = document.getElementById("mainContainer");
+
+      const routeSteps = splitRouteSteps(data.routeText);
+      const totalChecks = data.checklist.length;
+      const completedChecks = data.checklist.filter((_, idx) => state.checks[`d${data.day}_c${idx}`]).length;
+      const checkPercent = totalChecks > 0 ? Math.round((completedChecks / totalChecks) * 100) : 0;
+      const fatigueBadgeClass = getFatigueBadgeStyle(data.fatigueLevel);
+
+      main.innerHTML = `
+        <!-- 1. 상단 히어로 요약 배너 -->
+        <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-xl bg-[#C84B31] text-white text-xs font-extrabold">
+                DAY ${data.day} · ${data.dateLabel}
+              </span>
+              <span class="text-xs font-bold text-stone-500">${data.region}</span>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${fatigueBadgeClass}">
+              체력: ${data.fatigueLevel}
+            </span>
+          </div>
+
+          <h2 class="text-[19px] font-extrabold text-stone-900 leading-snug tracking-tight">
+            ${data.title}
+          </h2>
+
+          <p class="mt-2 text-[13.5px] leading-relaxed text-stone-600 bg-stone-50 p-3 rounded-2xl border border-stone-100">
+            ${data.summary}
+          </p>
+
+          <!-- 숙소 & 주요 교통편 -->
+          <div class="mt-3.5 grid grid-cols-1 gap-2 text-xs">
+            <div class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80">
+              <span class="text-base leading-none mt-0.5">🏨</span>
+              <div>
+                <span class="font-bold text-indigo-950 block">숙소</span>
+                <span class="text-stone-700 font-medium">${data.hotel}</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+              <span class="text-base leading-none mt-0.5">🚄</span>
+              <div>
+                <span class="font-bold text-slate-900 block">주요 이동 교통편</span>
+                <span class="text-stone-700 font-medium">${data.transport}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 상세 동선 타임라인 ('→' 기준 분리, 터치 체크) -->
+        ${renderAccordionCard({
+          id: "timeline",
+          icon: "🗺️",
+          title: "상세 동선 타임라인",
+          badge: `${routeSteps.length}단계`,
+          contentHtml: `
+            <div class="relative pl-4 border-l-2 border-indigo-200 space-y-2.5 my-1">
+              ${routeSteps.map((step, idx) => {
+                const stepKey = `d${data.day}_s${idx}`;
+                const isDone = !!state.steps[stepKey];
+                return `
+                  <div onclick="toggleStep('${stepKey}')" class="relative cursor-pointer group check-bounce">
+                    <span class="absolute -left-[23px] top-2.5 w-3.5 h-3.5 rounded-full border-2 transition-colors ${
+                      isDone
+                        ? "bg-emerald-500 border-emerald-500"
+                        : "bg-white border-[#1E3A5F] group-hover:bg-indigo-100"
+                    }"></span>
+                    <div class="p-3 rounded-2xl border transition-all ${
+                      isDone
+                        ? "bg-stone-50 border-stone-200/60 text-stone-400 line-through"
+                        : "bg-white border-stone-200/80 text-stone-800 shadow-2xs"
+                    }">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="text-[13.5px] font-medium leading-snug">${step}</span>
+                        <span class="text-xs shrink-0">${isDone ? "✅" : "⭕"}</span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `
+        })}
+
+        ${data.tipsMissingNotice ? `
+          <div class="px-4 py-3 rounded-2xl bg-indigo-50/80 border border-indigo-100 text-xs text-indigo-900 font-medium">
+            ℹ️ ${data.tipsMissingNotice}
+          </div>
+        ` : ""}
+
+        <!-- 3. 아코디언 ① 핵심 유의사항 & 실전 팁 -->
+        ${renderAccordionCard({
+          id: "coreTips",
+          icon: "💡",
+          title: "핵심 유의사항 & 실전 팁",
+          badge: `${data.coreTips.length}개`,
+          contentHtml: `
+            <ul class="space-y-2.5">
+              ${data.coreTips.map(tip => `
+                <li class="flex items-start gap-2.5 text-[13.5px] leading-relaxed text-stone-700 bg-amber-50/45 p-3 rounded-2xl border border-amber-100/80">
+                  <span class="text-amber-600 font-extrabold mt-0.5">•</span>
+                  <span>${formatBracketBold(tip)}</span>
+                </li>
+              `).join("")}
+            </ul>
+          `
+        })}
+
+        <!-- 4. 아코디언 ② 교통 환승 & 무계단 동선 -->
+        ${renderAccordionCard({
+          id: "transitTips",
+          icon: "🚇",
+          title: "교통 환승 & 무계단 동선",
+          badge: `${data.transitTips.length}개`,
+          contentHtml: `
+            <ul class="space-y-2.5">
+              ${data.transitTips.map(tip => `
+                <li class="flex items-start gap-2.5 text-[13.5px] leading-relaxed text-stone-700 bg-sky-50/50 p-3 rounded-2xl border border-sky-100">
+                  <span class="text-sky-600 font-extrabold mt-0.5">▸</span>
+                  <span>${formatBracketBold(tip)}</span>
+                </li>
+              `).join("")}
+            </ul>
+          `
+        })}
+
+        <!-- 5. 아코디언 ③ 입장료 & 발권 팁 -->
+        ${renderAccordionCard({
+          id: "ticketTips",
+          icon: "🎟️",
+          title: "입장료 & 발권 팁",
+          badge: "요금 안내",
+          contentHtml: `
+            <ul class="space-y-2.5">
+              ${data.ticketTips.map(tip => `
+                <li class="flex items-start gap-2.5 text-[13.5px] leading-relaxed text-stone-700 bg-stone-50 p-3 rounded-2xl border border-stone-200/80">
+                  <span class="text-emerald-600 font-extrabold mt-0.5">¥</span>
+                  <span>${formatBracketBold(tip)}</span>
+                </li>
+              `).join("")}
+            </ul>
+          `
+        })}
+
+        <!-- 6. 아코디언 ④ 체력 진단 & 플랜 B 대안 -->
+        ${renderAccordionCard({
+          id: "diagnosis",
+          icon: "🛡️",
+          title: "체력 진단 & 플랜 B 대안",
+          badge: data.fatigueLevel,
+          contentHtml: `
+            <div class="space-y-3">
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <div class="text-xs font-extrabold text-slate-800 mb-1">🔍 동선 · 체력 정밀 진단</div>
+                <p class="text-[13px] leading-relaxed text-stone-700">${data.diagnosis}</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-orange-50/60 border border-orange-200/70">
+                <div class="text-xs font-extrabold text-[#C84B31] mb-1.5">🛡️ 현장 유연 대응 및 실전 대안</div>
+                <ul class="space-y-1.5">
+                  ${data.alternatives.map(alt => `
+                    <li class="flex items-start gap-2 text-[13px] leading-relaxed text-stone-700">
+                      <span class="text-[#C84B31] font-bold">•</span>
+                      <span>${formatBracketBold(alt)}</span>
+                    </li>
+                  `).join("")}
+                </ul>
+              </div>
+            </div>
+          `
+        })}
+
+        <!-- 7. 오늘의 준비물 & 예약 체크리스트 -->
+        <section id="checklistSection" class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">✅</span>
+              <h3 class="text-[15.5px] font-extrabold text-stone-900">오늘의 준비물 & 예약 체크</h3>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${
+              checkPercent === 100
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-indigo-50 text-[#1E3A5F]"
+            }">
+              ${completedChecks}/${totalChecks} (${checkPercent}%)
+            </span>
+          </div>
+
+          <div class="w-full h-2 bg-stone-100 rounded-full overflow-hidden mb-4">
+            <div class="h-full transition-all duration-300 rounded-full ${
+              checkPercent === 100 ? "bg-emerald-500" : "bg-[#1E3A5F]"
+            }" style="width: ${checkPercent}%"></div>
+          </div>
+
+          <div class="space-y-2">
+            ${data.checklist.map((item, idx) => {
+              const checkKey = `d${data.day}_c${idx}`;
+              const isChecked = !!state.checks[checkKey];
+              return `
+                <div onclick="toggleDayCheck('${checkKey}')" class="flex items-start gap-3 p-3 rounded-2xl border cursor-pointer transition-all check-bounce ${
+                  isChecked
+                    ? "bg-emerald-50/40 border-emerald-200/80 text-stone-400"
+                    : "bg-stone-50/70 border-stone-200/80 text-stone-800 hover:bg-stone-100/70"
+                }">
+                  <div class="mt-0.5 w-5 h-5 rounded-lg flex items-center justify-center shrink-0 border transition-colors ${
+                    isChecked
+                      ? "bg-emerald-500 border-emerald-500 text-white"
+                      : "bg-white border-stone-300"
+                  }">
+                    ${isChecked ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ""}
+                  </div>
+                  <span class="text-[13.5px] font-medium leading-snug select-none ${isChecked ? "line-through" : ""}">
+                    ${item}
+                  </span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+
+          ${completedChecks > 0 ? `
+            <div class="mt-3 text-right">
+              <button onclick="resetDayChecks(${data.day})" class="text-[11px] font-semibold text-stone-400 hover:text-stone-600 underline">
+                Day ${data.day} 체크 초기화
+              </button>
+            </div>
+          ` : ""}
+        </section>
+      `;
+    }
+
+    // 전체 준비물 탭 화면 렌더링 ('여행 준비물' 시트 연동)
+    function isPackingItemChecked(item) {
+      if (Object.prototype.hasOwnProperty.call(state.packingChecks, item.id)) {
+        return !!state.packingChecks[item.id];
+      }
+      return !!item.sheetChecked;
+    }
+
+    function renderPackingView() {
+      const main = document.getElementById("mainContainer");
+      const categories = ["전체", ...new Set(state.packing.map(p => p.category))];
+      if (!categories.includes(state.packingCategoryFilter)) {
+        state.packingCategoryFilter = "전체";
+      }
+
+      const totalCount = state.packing.length;
+      const doneCount = state.packing.filter(p => isPackingItemChecked(p)).length;
+      const percent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+      const filteredItems = state.packingCategoryFilter === "전체"
+        ? state.packing
+        : state.packing.filter(p => p.category === state.packingCategoryFilter);
+
+      main.innerHTML = `
+        <!-- 전체 준비물 요약 배너 -->
+        <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2.5 py-1 rounded-xl bg-[#C84B31] text-white text-xs font-extrabold">
+              🎒 여행 준비물 체크리스트
+            </span>
+            <span class="text-xs font-extrabold text-[#1E3A5F]">
+              ${doneCount} / ${totalCount} 완료 (${percent}%)
+            </span>
+          </div>
+          <h2 class="text-[18px] font-extrabold text-stone-900 tracking-tight">
+            카테고리별 패킹 & 사전 준비 점검
+          </h2>
+          <p class="text-xs text-stone-500 mt-1">
+            Google 시트 '여행 준비물' 탭과 연동되며, 터치한 체크 상태는 아이폰에 자동 저장됩니다.
+          </p>
+
+          <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden mt-3.5">
+            <div class="h-full transition-all duration-300 rounded-full ${
+              percent === 100 ? "bg-emerald-500" : "bg-[#C84B31]"
+            }" style="width: ${percent}%"></div>
+          </div>
+
+          <!-- 카테고리 필터 알약 버튼 -->
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-3.5 pb-0.5">
+            ${categories.map(cat => {
+              const active = state.packingCategoryFilter === cat;
+              return `
+                <button
+                  onclick="setPackingFilter('${cat.replace(/'/g, "\\'")}')"
+                  class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition ${
+                    active
+                      ? "bg-[#1E3A5F] text-white border-[#1E3A5F]"
+                      : "bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100"
+                  }"
+                >
+                  ${cat}
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </section>
+
+        <!-- 준비물 리스트 카드 -->
+        <section id="checklistSection" class="bg-white rounded-3xl p-4 shadow-xs border border-stone-200/80 space-y-2.5 animate-card">
+          ${filteredItems.map(item => {
+            const checked = isPackingItemChecked(item);
+            return `
+              <div onclick="togglePackingCheck('${item.id}')" class="p-3.5 rounded-2xl border cursor-pointer transition-all check-bounce ${
+                checked
+                  ? "bg-emerald-50/40 border-emerald-200/80"
+                  : "bg-stone-50/70 border-stone-200/80 hover:bg-stone-100/70"
+              }">
+                <div class="flex items-start gap-3">
+                  <div class="mt-0.5 w-5 h-5 rounded-lg flex items-center justify-center shrink-0 border transition-colors ${
+                    checked
+                      ? "bg-emerald-500 border-emerald-500 text-white"
+                      : "bg-white border-stone-300"
+                  }">
+                    ${checked ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ""}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center justify-between gap-1.5">
+                      <span class="text-[14px] font-bold ${checked ? "line-through text-stone-400" : "text-stone-900"}">
+                        ${item.item}
+                      </span>
+                      <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                        checked ? "bg-stone-200/60 text-stone-400" : "bg-indigo-50 text-[#1E3A5F]"
+                      }">
+                        ${item.qty}
+                      </span>
+                    </div>
+                    <div class="text-[11px] font-semibold text-stone-400 mt-0.5">
+                      ${item.category}
+                    </div>
+                    ${item.tip ? `
+                      <p class="mt-1.5 text-xs leading-relaxed ${checked ? "text-stone-400" : "text-stone-600"}">
+                        ${item.tip}
+                      </p>
+                    ` : ""}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </section>
+      `;
+    }
+
+    function renderAccordionCard({ id, icon, title, badge, contentHtml }) {
+      const isOpen = !!state.accordion[id];
+      return `
+        <section class="bg-white rounded-3xl shadow-xs border border-stone-200/80 overflow-hidden animate-card">
+          <button
+            onclick="toggleAccordion('${id}')"
+            class="w-full px-5 py-4 flex items-center justify-between text-left active:bg-stone-50 transition"
+            aria-expanded="${isOpen}"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-lg leading-none shrink-0">${icon}</span>
+              <h3 class="text-[15px] font-extrabold text-stone-900 tracking-tight truncate">${title}</h3>
+              ${badge ? `<span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 text-[11px] font-bold shrink-0">${badge}</span>` : ""}
+            </div>
+            <svg class="w-5 h-5 text-stone-400 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="px-5 pb-5 ${isOpen ? "block" : "hidden"}">
+            ${contentHtml}
+          </div>
+        </section>
+      `;
+    }
+
+    function formatBracketBold(text) {
+      return text.replace(/(\[[^\]]+\])/g, '<strong class="text-stone-900 font-extrabold">$1</strong>');
+    }
+
+    // =========================================================================
+    // 7. 사용자 인터랙션 핸들러
+    // =========================================================================
+    function selectTab(idx) {
+      if (idx < 0 || idx > 6) return;
+      state.activeTab = idx;
+      saveLocalPreferences();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function changeTab(delta) {
+      selectTab(state.activeTab + delta);
+    }
+
+    function toggleAccordion(id) {
+      state.accordion[id] = !state.accordion[id];
+      saveLocalPreferences();
+      renderAll();
+    }
+
+    function toggleStep(key) {
+      state.steps[key] = !state.steps[key];
+      saveLocalPreferences();
+      renderAll();
+    }
+
+    function toggleDayCheck(key) {
+      state.checks[key] = !state.checks[key];
+      saveLocalPreferences();
+      renderAll();
+    }
+
+    function togglePackingCheck(itemId) {
+      const target = state.packing.find(p => p.id === itemId);
+      const currentVal = target ? isPackingItemChecked(target) : false;
+      state.packingChecks[itemId] = !currentVal;
+      saveLocalPreferences();
+      renderAll();
+    }
+
+    function setPackingFilter(category) {
+      state.packingCategoryFilter = category;
+      renderPackingView();
+    }
+
+    function resetDayChecks(dayNum) {
+      const dayObj = state.days.find(d => d.day === dayNum);
+      if (!dayObj) return;
+      dayObj.checklist.forEach((_, idx) => {
+        delete state.checks[`d${dayNum}_c${idx}`];
+      });
+      saveLocalPreferences();
+      renderAll();
+      showToast(`Day ${dayNum} 체크리스트가 초기화되었습니다.`);
+    }
+
+    function scrollToChecklist() {
+      const el = document.getElementById("checklistSection");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // =========================================================================
+    // 8. 모달, 환율 양방향 계산기 및 시트 ID 설정 기능
+    // =========================================================================
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      if (id === "currencyModal") {
+        setTimeout(() => document.getElementById("jpyInput").focus(), 100);
+      } else if (id === "syncModal") {
+        document.getElementById("sheetIdInput").value = state.sheetId;
+        updateSyncStatusUI();
+      }
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function closeModalOnBackdrop(event, id) {
+      if (event.target.id === id) closeModal(id);
+    }
+
+    // 환율 계산기 (100엔 = 900원 -> 1엔 = 9원)
+    function onJpyChange() {
+      const jpyVal = parseFloat(document.getElementById("jpyInput").value);
+      const krwInput = document.getElementById("krwInput");
+      if (isNaN(jpyVal) || jpyVal <= 0) {
+        krwInput.value = "";
+        return;
+      }
+      krwInput.value = Math.round(jpyVal * 9);
+    }
+
+    function onKrwChange() {
+      const krwVal = parseFloat(document.getElementById("krwInput").value);
+      const jpyInput = document.getElementById("jpyInput");
+      if (isNaN(krwVal) || krwVal <= 0) {
+        jpyInput.value = "";
+        return;
+      }
+      jpyInput.value = Math.round(krwVal / 9);
+    }
+
+    function addJpy(amount) {
+      const jpyInput = document.getElementById("jpyInput");
+      const current = parseFloat(jpyInput.value) || 0;
+      jpyInput.value = current + amount;
+      onJpyChange();
+    }
+
+    function clearCurrency() {
+      document.getElementById("jpyInput").value = "";
+      document.getElementById("krwInput").value = "";
+      document.getElementById("jpyInput").focus();
+    }
+
+    // 시트 ID 저장 및 동기화
+    function saveSheetIdAndSync() {
+      const inputVal = document.getElementById("sheetIdInput").value.trim();
+      if (!inputVal) {
+        showToast("시트 ID를 입력해 주세요.");
+        return;
+      }
+      // 전체 URL을 붙여넣은 경우 시트 ID만 자동 추출
+      const urlMatch = inputVal.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      state.sheetId = urlMatch ? urlMatch[1] : inputVal;
+      document.getElementById("sheetIdInput").value = state.sheetId;
+      saveLocalPreferences();
+      closeModal("syncModal");
+      syncFromGoogleSheet(true);
+    }
+
+    function resetDefaultSheetId() {
+      state.sheetId = DEFAULT_SHEET_ID;
+      document.getElementById("sheetIdInput").value = DEFAULT_SHEET_ID;
+      saveLocalPreferences();
+      showToast("기본 시트 ID로 복원되었습니다.");
+    }
+
+    function clearCachedSheetData() {
+      localStorage.removeItem(STORAGE_KEYS.CACHED_DATA);
+      localStorage.removeItem(STORAGE_KEYS.LAST_SYNC);
+      state.days = JSON.parse(JSON.stringify(FALLBACK_DAYS));
+      state.packing = JSON.parse(JSON.stringify(FALLBACK_PACKING));
+      state.syncMode = "fallback";
+      state.lastSyncTime = null;
+      updateSyncStatusUI();
+      renderAll();
+      showToast("캐시가 초기화되었습니다.");
+    }
+
+    function openSheetInNewTab() {
+      window.open(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(state.sheetId)}/edit`, "_blank");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastMsg").textContent = msg;
+      toast.classList.remove("opacity-0");
+      setTimeout(() => toast.classList.add("opacity-0"), 2200);
+    }
+
+    // =========================================================================
+    // 9. 좌우 스와이프 제스처 지원
+    // =========================================================================
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.addEventListener("touchstart", (e) => {
+      if (e.target.closest("#dayTabs") || e.target.closest(".overflow-x-auto")) return;
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener("touchend", (e) => {
+      if (e.target.closest("#dayTabs") || e.target.closest(".overflow-x-auto")) return;
+      const diffX = e.changedTouches[0].screenX - touchStartX;
+      const diffY = e.changedTouches[0].screenY - touchStartY;
+
+      if (Math.abs(diffX) > 75 && Math.abs(diffX) > Math.abs(diffY) * 1.6) {
+        if (diffX < 0 && state.activeTab < 6) {
+          changeTab(1);
+        } else if (diffX > 0 && state.activeTab > 0) {
+          changeTab(-1);
+        }
+      }
+    }, { passive: true });
+
+    // =========================================================================
+    // 10. 앱 초기화 및 자동 동기화 실행
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadLocalState();
+      updateSyncStatusUI();
+      renderAll();
+      // 접속 시 Google 시트 최신 데이터 자동 동기화 시도
+      syncFromGoogleSheet(false);
+    });
+  </script>
+</body>
+</html>
