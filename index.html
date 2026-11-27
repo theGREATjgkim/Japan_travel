@@ -69,6 +69,23 @@
       max-width: 86vh;
       max-height: 92vw;
     }
+    /* 아이폰 상단 헤더: 제목과 퀵 액션을 한 줄로 배치 */
+    .trip-topline { display:flex; align-items:center; justify-content:space-between; gap:6px; min-width:0; }
+    .trip-title { min-width:0; flex:1 1 auto; margin:0; font-size:clamp(17px, 4.8vw, 23px); line-height:1.15; font-weight:900; letter-spacing:-.055em; white-space:nowrap; }
+    .trip-actions { display:flex; align-items:center; justify-content:flex-end; gap:4px; flex:0 0 auto; }
+    .trip-action { width:32px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:11px; border:1px solid transparent; font-size:17px; line-height:1; transition:transform .15s, background .15s; }
+    .trip-action:active { transform:scale(.93); }
+    .trip-action.emergency { color:#991b1b; background:#fef2f2; border-color:#fecaca; }
+    .trip-action.currency { color:#92400e; background:#fffbeb; border-color:#fde68a; }
+    .trip-action.sync { color:#166534; background:#f0fdf4; border-color:#bbf7d0; font-size:22px; font-weight:700; }
+    .trip-sync-time { margin:3px 0 0 1px; color:#a8a29e; font-size:10px; line-height:1.2; font-weight:500; }
+    @media (max-width:380px) {
+      .trip-title { font-size:clamp(14px, 4.8vw, 18px); letter-spacing:-.06em; }
+      .trip-actions { gap:3px; }
+      .trip-action { width:29px; height:32px; font-size:16px; border-radius:10px; }
+      .trip-action.sync { font-size:20px; }
+    }
+
     /* 최신 모바일 UI 감성: 타이포그래피 · 카드 · 그림자 */
     html { font-size: 17px; }
     body {
@@ -105,62 +122,41 @@
     .text-lg { font-size: 20px !important; }
     .text-\[28px\] { font-size: 31px !important; }
     .text-\[34px\] { font-size: 37px !important; }
-  </style>
+  
+    @media (max-width: 390px) {
+      #weatherBar { gap: 5px; padding-left: 8px; padding-right: 8px; font-size: 10px; }
+      #weatherBar > div:last-child { gap: 7px; }
+      #weatherLocationLabel { max-width: 88px; }
+    }
+</style>
 </head>
 <body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
 
   <!-- 상단 고정 헤더 -->
   <header class="sticky top-0 z-40 ios-glass border-b border-stone-200/80" style="padding-top: var(--safe-top);">
-    <div class="max-w-lg mx-auto px-4 pt-3 pb-2.5">
-      <div class="flex items-center justify-between gap-2">
-        <div class="min-w-0 flex-1">
-          <div class="flex flex-wrap items-center gap-1.5">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#1E3A5F] text-white tracking-tight">
-              2027.01.10 - 01.15
-            </span>
-            <button onclick="switchPage('settings')" id="syncStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-600 border border-stone-200 active:scale-95 transition">
-              <span id="syncDot" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-              <span id="syncStatusText">연동 확인 중...</span>
-            </button>
-          </div>
-          <h1 class="text-[18px] font-extrabold text-stone-900 tracking-tight mt-1 leading-snug">
-            교토 · 오사카 여행
-          </h1>
-          <p id="lastSyncTimeText" class="text-[10px] text-stone-400 font-medium mt-0.5">
-            Google 시트 동기화 준비 중
-          </p>
-        </div>
-
-        <!-- 상단 퀵 버튼 (번역 / 환율 / 새로고침) -->
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button onclick="openPhotoSpots()" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-fuchsia-50 hover:bg-fuchsia-100 active:scale-95 text-fuchsia-900 border border-fuchsia-200/90 text-xs font-extrabold transition">
-            <span>📸</span>
-            <span>사진</span>
-          </button>
-          <button onclick="openModal('emergencyModal')" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-red-50 hover:bg-red-100 active:scale-95 text-red-800 border border-red-200/90 text-xs font-extrabold transition">
-            <span>🚨</span>
-            <span>긴급</span>
-          </button>
-          <button onclick="openModal('currencyModal')" class="flex items-center gap-1 px-2.5 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 border border-amber-200/80 text-xs font-bold transition">
-            <span>💴</span>
-            <span>환율</span>
-          </button>
-          <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="시트 새로고침" aria-label="시트 새로고침" class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 border border-emerald-200/80 text-sm font-bold transition">
-            <span id="refreshIcon">🔄</span>
-          </button>
+    <div class="max-w-lg mx-auto px-3 sm:px-4 pt-3 pb-2.5">
+      <div class="trip-topline">
+        <h1 class="trip-title">교토 · 오사카 여행 가이드</h1>
+        <div class="trip-actions" aria-label="빠른 메뉴">
+          <button onclick="openModal('emergencyModal')" class="trip-action emergency" title="긴급 연락" aria-label="긴급 연락">🚨</button>
+          <button onclick="openModal('currencyModal')" class="trip-action currency" title="환율 계산기" aria-label="환율 계산기">💵</button>
+          <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="Google 시트 동기화" aria-label="Google 시트 동기화" class="trip-action sync"><span id="refreshIcon" aria-hidden="true">↻</span></button>
         </div>
       </div>
+      <p id="lastSyncTimeText" class="trip-sync-time">Google 시트 동기화 준비 중</p>
 
-      <!-- 현재 위치 날씨 위젯 (기온 · 강수확률 · 일몰시각) -->
-      <div id="weatherBar" onclick="fetchCurrentLocationWeather(true)" title="탭하여 현재 위치 날씨 갱신" class="mt-2 px-3 py-1.5 rounded-2xl bg-sky-50/90 border border-sky-200/80 flex items-center justify-between gap-2 text-[11px] text-sky-950 cursor-pointer active:scale-[0.99] transition">
-        <div class="flex items-center gap-1.5 min-w-0">
-          <span id="weatherIcon" class="text-sm leading-none">📍</span>
-          <span id="weatherLocationLabel" class="font-extrabold shrink-0">현재 위치</span>
-          <span id="weatherTempText" class="font-bold text-sky-900 truncate">날씨 확인 중...</span>
+      <!-- 현재 위치 날씨 위젯: 한 줄 표시 -->
+      <div id="weatherBar" onclick="fetchCurrentLocationWeather(true)" title="탭하여 현재 위치 날씨 갱신" class="mt-2 px-2.5 py-2 rounded-2xl bg-sky-50/90 border border-sky-200/80 flex flex-nowrap items-center justify-between gap-1.5 text-[11px] text-sky-950 cursor-pointer active:scale-[0.99] transition whitespace-nowrap overflow-hidden">
+        <div class="flex items-center gap-1 min-w-0 shrink">
+          <span id="weatherIcon" class="text-sm leading-none shrink-0">📍</span>
+          <span id="weatherLocationLabel" class="font-extrabold truncate">위치 확인 중</span>
+    <span id="weatherLocationStatus" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="현재 위치 조회 성공"></span>
         </div>
-        <div class="flex items-center gap-2.5 shrink-0 font-semibold text-sky-800">
-          <span id="weatherRainText">💧 -%</span>
-          <span id="weatherSunsetText">🌅 일몰 -:--</span>
+        <div class="flex flex-nowrap items-center gap-2 sm:gap-3 font-semibold text-sky-800 shrink-0">
+          <span id="weatherTempText">--°C</span>
+          <span id="weatherWindText">🌬️ --m/s</span>
+          <span id="weatherRainText">💧 --%</span>
+          <span id="weatherSunsetText">🌅 --:--</span>
         </div>
       </div>
 
@@ -638,6 +634,8 @@
       weather: {
         locationName: "교토",
         temp: null,
+        feelsLike: null,
+        windSpeed: null,
         rainProb: null,
         sunset: null,
         icon: "📍"
@@ -739,12 +737,13 @@
 
     async function loadWeatherByCoords(lat, lon, labelText = "현재 위치", isManual = false) {
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&daily=precipitation_probability_max,sunset&timezone=auto&forecast_days=1`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,weather_code&daily=precipitation_probability_max,sunset&timezone=auto&forecast_days=1`;
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error("Weather API failed");
         const data = await res.json();
 
         const temp = data.current?.temperature_2m;
+        const windSpeed = data.current?.wind_speed_10m;
         const code = data.current?.weather_code ?? 1;
         const rainProb = data.daily?.precipitation_probability_max?.[0] ?? 0;
         const sunsetRaw = data.daily?.sunset?.[0] || "";
@@ -752,7 +751,8 @@
 
         state.weather = {
           locationName: labelText,
-          temp: typeof temp === "number" ? `${Math.round(temp)}°C` : "-°C",
+          temp: typeof temp === "number" ? `${Math.round(temp)}°C` : "--°C",
+          windSpeed: typeof windSpeed === "number" ? `${windSpeed.toFixed(1)}m/s` : "--m/s",
           rainProb: `${rainProb}%`,
           sunset: sunsetTime,
           icon: getWeatherIcon(code)
@@ -760,54 +760,91 @@
         renderWeatherBar();
         if (isManual) showToast(`${labelText} 날씨를 업데이트했습니다.`);
       } catch (e) {
+        // 현재 위치의 날씨 API 조회가 실패하면 오사카 날씨로 대체합니다.
+        if (labelText !== "오사카") {
+          loadWeatherByCoords(34.6937, 135.5023, "오사카", isManual);
+          return;
+        }
         state.weather = {
-          locationName: labelText,
-          temp: "기준 2~10°C",
-          rainProb: "20%",
-          sunset: "17:05",
-          icon: "📍"
+          locationName: "오사카",
+          temp: "--°C",
+          windSpeed: "--m/s",
+          rainProb: "--%",
+          sunset: "--:--",
+          icon: "📍",
+          locationVerified: false
         };
         renderWeatherBar();
-        if (isManual) showToast("날씨 정보를 불러오지 못해 기준값을 표시합니다.");
+        if (isManual) showToast("날씨 정보를 불러오지 못했습니다.");
       }
     }
 
     function fetchCurrentLocationWeather(isManual = false) {
-      state.weather.temp = "위치 확인 중...";
+      state.weather.temp = "--°C";
+      state.weather.windSpeed = "--m/s";
+      state.weather.locationName = "위치 확인 중";
+      state.weather.locationVerified = false;
       renderWeatherBar();
 
+      const fallbackToOsaka = (reason = "") => {
+        // 위치 조회에 실패하면 오사카 날씨를 기본으로 표시합니다.
+        loadWeatherByCoords(34.6937, 135.5023, "오사카", isManual);
+        if (isManual && reason) showToast(reason + " · 오사카 날씨를 표시합니다.");
+      };
+
       if (!navigator.geolocation) {
-        loadWeatherByCoords(35.0116, 135.7681, "교토", isManual);
+        fallbackToOsaka("이 브라우저는 위치 정보를 지원하지 않습니다");
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           const { latitude, longitude } = pos.coords;
-          let placeLabel = "교토";
+          let placeLabel = "";
           try {
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&accept-language=ko`);
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1&accept-language=ko`);
             if (geoRes.ok) {
               const geo = await geoRes.json();
-              const city = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || geo.address?.state;
-              if (city) placeLabel = city;
+              const a = geo.address || {};
+              const city = a.city || a.town || a.village || a.municipality || a.county || a.state;
+              const district = a.city_district || a.suburb || a.borough || a.quarter || a.neighbourhood;
+              if (city && district && city !== district) placeLabel = `${city} ${district}`;
+              else if (city) placeLabel = city;
+              else if (district) placeLabel = district;
+              else if (geo.name) placeLabel = geo.name;
             }
-          } catch (_) {}
-          loadWeatherByCoords(latitude, longitude, placeLabel, isManual);
+          } catch (_) {
+            // 역지오코딩이 실패해도 GPS 좌표로 해당 지점의 날씨는 계속 조회합니다.
+          }
+          if (!placeLabel) {
+            fallbackToOsaka("도시명을 확인할 수 없습니다");
+            return;
+          }
+          loadWeatherByCoords(latitude, longitude, placeLabel, isManual).then(() => {
+            // 실제 GPS 좌표로 날씨 조회가 완료된 경우에만 초록색 점을 표시합니다.
+            if (state.weather.locationName === placeLabel) {
+              state.weather.locationVerified = true;
+              renderWeatherBar();
+            }
+          });
         },
-        () => {
-          loadWeatherByCoords(35.0116, 135.7681, "교토", isManual);
+        (error) => {
+          const reason = error?.code === 1 ? "위치 권한이 차단되어 있습니다" : "현재 위치를 확인할 수 없습니다";
+          fallbackToOsaka(reason);
         },
-        { enableHighAccuracy: false, timeout: 7000, maximumAge: 300000 }
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 120000 }
       );
     }
 
     function renderWeatherBar() {
       document.getElementById("weatherIcon").textContent = state.weather.icon;
-      document.getElementById("weatherLocationLabel").textContent = state.weather.locationName;
-      document.getElementById("weatherTempText").textContent = state.weather.temp ? `기온 ${state.weather.temp}` : "확인 중...";
+      document.getElementById("weatherLocationLabel").textContent = state.weather.locationName || "위치 확인 중";
+      const locationStatus = document.getElementById("weatherLocationStatus");
+      if (locationStatus) locationStatus.classList.toggle("hidden", !state.weather.locationVerified);
+      document.getElementById("weatherTempText").textContent = state.weather.temp ?? "--°C";
+      document.getElementById("weatherWindText").textContent = `🌬️ ${state.weather.windSpeed ?? "--m/s"}`;
       document.getElementById("weatherRainText").textContent = `💧 ${state.weather.rainProb ?? "-%"}`;
-      document.getElementById("weatherSunsetText").textContent = `🌅 일몰 ${state.weather.sunset ?? "--:--"}`;
+      document.getElementById("weatherSunsetText").textContent = `🌅 ${state.weather.sunset ?? "--:--"}`;
     }
 
     // =========================================================================
@@ -1115,7 +1152,7 @@
             const qty = getCellText(row, 4);
             const tip = getCellText(row, 5);
             if (!item && !qty && !tip) return;
-            if (!item || item === "준비물 항목" || item === "항목" || item.includes("합계")) return;
+            if (!item || item === "0" || item === "0 항목" || item === "준비물 항목" || item === "항목" || item.includes("합계")) return;
             if (cat && cat !== "카테고리") lastCat = cat;
             temp.push({
               id: `sheet_p_${idx}`,
@@ -1170,27 +1207,48 @@
     }
 
     function updateSyncStatusUI() {
-      const dot = document.getElementById("syncDot");
-      const text = document.getElementById("syncStatusText");
       const timeText = document.getElementById("lastSyncTimeText");
       const modalStatus = document.getElementById("settingsSyncStatus");
       const modalTime = document.getElementById("settingsSyncTime");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const refreshIcon = document.getElementById("refreshIcon");
 
       if (state.syncMode === "live") {
-        dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500";
-        text.textContent = "시트 연결됨";
-        timeText.textContent = `동기화: ${state.lastSyncTime || "방금 전"}`;
+        if (timeText) timeText.textContent = `시트 연결됨 · ${state.lastSyncTime || "방금 전"}`;
         if (modalStatus) modalStatus.textContent = "🟢 실시간 Google 시트 연결됨";
+        if (refreshBtn) {
+          refreshBtn.className = "trip-action sync";
+          refreshBtn.style.background = "";
+          refreshBtn.style.borderColor = "";
+          refreshBtn.style.color = "";
+          refreshBtn.title = "시트 연결됨 · 탭하여 새로고침";
+          refreshBtn.setAttribute("aria-label", "시트 연결됨 · 새로고침");
+        }
+        if (refreshIcon) refreshIcon.textContent = "↻";
       } else if (state.syncMode === "cache") {
-        dot.className = "w-1.5 h-1.5 rounded-full bg-amber-500";
-        text.textContent = "캐시 사용 중";
-        timeText.textContent = `마지막 동기화: ${state.lastSyncTime || "기록 없음"}`;
+        if (timeText) timeText.textContent = `캐시 사용 중 · 마지막 동기화 ${state.lastSyncTime || "기록 없음"}`;
         if (modalStatus) modalStatus.textContent = "🟡 오프라인 캐시 데이터";
+        if (refreshBtn) {
+          refreshBtn.className = "trip-action sync";
+          refreshBtn.style.background = "#fffbeb";
+          refreshBtn.style.borderColor = "#fde68a";
+          refreshBtn.style.color = "#92400e";
+          refreshBtn.title = "캐시 사용 중 · 탭하여 다시 연결";
+          refreshBtn.setAttribute("aria-label", "캐시 사용 중 · 다시 연결");
+        }
+        if (refreshIcon) refreshIcon.textContent = "↻";
       } else {
-        dot.className = "w-1.5 h-1.5 rounded-full bg-slate-400";
-        text.textContent = "기본 데이터";
-        timeText.textContent = "시트 공유 확인 후 🔄 새로고침";
+        if (timeText) timeText.textContent = "기본 데이터 · 시트 연결 확인 필요";
         if (modalStatus) modalStatus.textContent = "⚪ 기본 내장 데이터";
+        if (refreshBtn) {
+          refreshBtn.className = "trip-action sync";
+          refreshBtn.style.background = "#f1f5f9";
+          refreshBtn.style.borderColor = "#cbd5e1";
+          refreshBtn.style.color = "#475569";
+          refreshBtn.title = "시트 연결 · 탭하여 다시 시도";
+          refreshBtn.setAttribute("aria-label", "시트 연결 다시 시도");
+        }
+        if (refreshIcon) refreshIcon.textContent = "↻";
       }
       if (modalTime) modalTime.textContent = state.lastSyncTime || "기록 없음";
     }
@@ -1331,18 +1389,15 @@
 
         ${renderAccordionCard({
           id: "timeline", icon: "🗺️", title: "상세 동선 타임라인", badge: `${routeSteps.length}단계`,
-          contentHtml: `
-            <div class="flex gap-2 mb-3">
-              <a href="${mapsDirectionsUrl(data.hotel)}" target="_blank" rel="noopener"
-                 class="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white text-xs font-extrabold text-center active:scale-[0.98] transition">
-                현재 위치 → 숙소 길찾기
-              </a>
-              <a href="${mapsSearchUrl(data.region + " 관광명소")}" target="_blank" rel="noopener"
-                 class="px-3 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-xs font-extrabold active:scale-[0.98] transition">
-                오늘 일정 지도
-              </a>
+          headerActions: `
+            <div class="flex items-center gap-1 shrink-0 pr-3">
+              <a href="${mapsDirectionsUrl(data.hotel)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                 class="px-2 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-bold whitespace-nowrap active:scale-95 transition">숙소로</a>
+              <a href="${mapsSearchUrl(data.region + " 관광명소")}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                 class="px-2 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold whitespace-nowrap active:scale-95 transition">오늘의 경로</a>
             </div>
-
+          `,
+          contentHtml: `
             <div class="relative pl-4 border-l-2 border-indigo-100 space-y-2 my-1">
               ${routeSteps.map((step, idx) => {
                 const key = `d${data.day}_s${idx}`;
@@ -1712,18 +1767,21 @@
       updateSyncStatusUI();
     }
 
-    function renderAccordionCard({ id, icon, title, badge, contentHtml }) {
+    function renderAccordionCard({ id, icon, title, badge, contentHtml, headerActions = "" }) {
       const isOpen = !!state.accordion[id];
       return `
         <section class="bg-white rounded-3xl shadow-xs border border-stone-200/80 overflow-hidden animate-card">
-          <button onclick="toggleAccordion('${id}')" class="w-full px-5 py-4 flex items-center justify-between text-left active:bg-stone-50 transition" aria-expanded="${isOpen}">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="text-lg leading-none shrink-0">${icon}</span>
-              <h3 class="text-[15px] font-extrabold text-stone-900 tracking-tight truncate">${title}</h3>
-              ${badge ? `<span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 text-[11px] font-bold shrink-0">${badge}</span>` : ""}
-            </div>
-            <svg class="w-5 h-5 text-stone-400 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-          </button>
+          <div class="w-full px-3 sm:px-5 py-3.5 flex items-center gap-2">
+            <button onclick="toggleAccordion('${id}')" class="flex-1 min-w-0 flex items-center justify-between text-left active:bg-stone-50 transition" aria-expanded="${isOpen}">
+              <span class="flex items-center gap-2 min-w-0">
+                <span class="text-lg leading-none shrink-0">${icon}</span>
+                <h3 class="text-[15px] font-extrabold text-stone-900 tracking-tight truncate">${title}</h3>
+                ${badge ? `<span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 text-[11px] font-bold shrink-0">${badge}</span>` : ""}
+              </span>
+              <svg class="w-5 h-5 text-stone-400 shrink-0 transition-transform duration-200 ml-1 ${isOpen ? "rotate-180" : ""}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            ${headerActions}
+          </div>
           <div class="px-5 pb-5 ${isOpen ? "block" : "hidden"}">${contentHtml}</div>
         </section>
       `;
