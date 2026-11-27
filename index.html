@@ -71,12 +71,13 @@
     }
     /* 아이폰 상단 헤더: 제목과 퀵 액션을 한 줄로 배치 */
     .trip-topline { display:flex; align-items:center; justify-content:space-between; gap:6px; min-width:0; }
-    .trip-title { min-width:0; flex:1 1 auto; margin:0; font-size:clamp(17px, 4.8vw, 23px); line-height:1.15; font-weight:900; letter-spacing:-.055em; white-space:nowrap; }
+    .trip-title { min-width:0; flex:1 1 auto; margin:0; color:#1E3A5F; font-size:clamp(17px, 4.8vw, 23px); line-height:1.15; font-weight:900; letter-spacing:-.055em; white-space:nowrap; text-shadow:0 1px 0 rgba(255,255,255,.7); }
     .trip-actions { display:flex; align-items:center; justify-content:flex-end; gap:4px; flex:0 0 auto; }
     .trip-action { width:32px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:11px; border:1px solid transparent; font-size:17px; line-height:1; transition:transform .15s, background .15s; }
     .trip-action:active { transform:scale(.93); }
     .trip-action.emergency { color:#991b1b; background:#fef2f2; border-color:#fecaca; }
     .trip-action.currency { color:#92400e; background:#fffbeb; border-color:#fde68a; }
+    .trip-action.settings { color:#334155; background:#f1f5f9; border-color:#cbd5e1; }
     .trip-action.sync { color:#166534; background:#f0fdf4; border-color:#bbf7d0; font-size:22px; font-weight:700; }
     .trip-sync-time { margin:3px 0 0 1px; color:#a8a29e; font-size:10px; line-height:1.2; font-weight:500; }
     @media (max-width:380px) {
@@ -140,6 +141,7 @@
         <div class="trip-actions" aria-label="빠른 메뉴">
           <button onclick="openModal('emergencyModal')" class="trip-action emergency" title="긴급 연락" aria-label="긴급 연락">🚨</button>
           <button onclick="openModal('currencyModal')" class="trip-action currency" title="환율 계산기" aria-label="환율 계산기">💵</button>
+          <button id="nav-settings" onclick="switchPage('settings')" class="trip-action settings" title="설정" aria-label="설정">⚙️</button>
           <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="Google 시트 동기화" aria-label="Google 시트 동기화" class="trip-action sync"><span id="refreshIcon" aria-hidden="true">↻</span></button>
         </div>
       </div>
@@ -177,9 +179,9 @@
     <!-- 선택된 페이지 렌더링 -->
   </main>
 
-  <!-- 하단 고정 5탭 네비게이션: 일정&팁 - 번역 - 가계부 - 준비물 - 설정 -->
+  <!-- 하단 고정 4탭 네비게이션: 일정&팁 - 번역 - 가계부 - 준비물 -->
   <footer id="bottomFooter" class="fixed bottom-0 inset-x-0 z-30 ios-glass border-t border-stone-200/90" style="padding-bottom: var(--safe-bottom);">
-    <nav class="max-w-lg mx-auto px-2 py-1.5 grid grid-cols-5 gap-1" aria-label="하단 메뉴">
+    <nav class="max-w-lg mx-auto px-2 py-1.5 grid grid-cols-4 gap-1" aria-label="하단 메뉴">
       <button id="nav-schedule" onclick="switchPage('schedule')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
         <span class="text-base leading-none">🗓️</span>
         <span class="text-[11px] font-extrabold mt-1 tracking-tight">일정&팁</span>
@@ -195,10 +197,6 @@
       <button id="nav-packing" onclick="switchPage('packing')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
         <span class="text-base leading-none">🎒</span>
         <span class="text-[11px] font-extrabold mt-1 tracking-tight">준비물</span>
-      </button>
-      <button id="nav-settings" onclick="switchPage('settings')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
-        <span class="text-base leading-none">⚙️</span>
-        <span class="text-[11px] font-extrabold mt-1 tracking-tight">설정</span>
       </button>
     </nav>
   </footer>
@@ -1276,6 +1274,10 @@
       ["schedule", "translate", "expense", "packing", "settings"].forEach(k => {
         const el = document.getElementById(`nav-${k}`);
         if (!el) return;
+        if (k === "settings") {
+          el.className = `trip-action settings ${state.activePage === k ? "ring-2 ring-slate-400 ring-offset-1" : ""}`;
+          return;
+        }
         el.className = `flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition ${
           state.activePage === k ? map[k] : "text-stone-600 hover:bg-stone-100"
         }`;
@@ -1388,7 +1390,7 @@
         </section>
 
         ${renderAccordionCard({
-          id: "timeline", icon: "🗺️", title: "상세 동선 타임라인", badge: `${routeSteps.length}단계`,
+          id: "timeline", icon: "🗺️", title: "타임라인", badge: `${routeSteps.length}단계`,
           headerActions: `
             <div class="flex items-center gap-1 shrink-0 pr-3">
               <a href="${mapsDirectionsUrl(data.hotel)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
