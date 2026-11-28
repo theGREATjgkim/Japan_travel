@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#EBF2FA" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="교토 · 오사카 여행" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=2" />
+  <title>교토 · 오사카 여행</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+      background-color: #F6F5F2;
+      color: #1E242B;
+      padding-bottom: calc(84px + var(--safe-bottom));
+      overscroll-behavior-y: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* 상단 헤더 & 하단 탭 전용 은은한 컬러 글래스 */
+    .header-tinted-glass {
+      background: linear-gradient(180deg, rgba(235, 242, 250, 0.94) 0%, rgba(244, 247, 252, 0.90) 100%);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(30, 58, 95, 0.14);
+      box-shadow: 0 4px 16px -8px rgba(30, 58, 95, 0.16);
+    }
+    .footer-tinted-glass {
+      background: linear-gradient(180deg, rgba(244, 247, 252, 0.92) 0%, rgba(234, 240, 248, 0.96) 100%);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-top: 1px solid rgba(30, 58, 95, 0.14);
+      box-shadow: 0 -4px 16px -8px rgba(30, 58, 95, 0.14);
+    }
+    html { background: #EBF2FA; overflow-x: hidden; }
+    body { overflow-x: hidden; }
+    /* 상단 헤더: 상태바(노치) 영역까지 배경 확장 */
+    header.header-tinted-glass { background: linear-gradient(180deg, #E6EEF8 0%, #F1F5FB 100%) !important; }
+    /* 하단 탭 자동 숨김 */
+    #bottomFooter { transition: transform .32s cubic-bezier(.22,.68,.32,1); will-change: transform; }
+    #bottomFooter.nav-hidden { transform: translateY(calc(100% + 4px)); }
+    /* 스와이프 페이지 전환 */
+    #mainContainer { will-change: transform, opacity; touch-action: pan-y; }
+    #mainContainer.swiping .animate-card { animation: none !important; opacity: 1 !important; transform: none !important; }
+    #mainContainer.swiping { transition: none; }
+    #mainContainer.snap { transition: transform .34s cubic-bezier(.22,.68,.32,1), opacity .34s ease; }
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-card {
+      animation: fadeSlideUp 0.2s ease-out forwards;
+    }
+    .check-bounce:active {
+      transform: scale(0.98);
+    }
+    @keyframes spinOnce {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-loading {
+      animation: spinOnce 0.8s linear infinite;
+    }
+    .landscape-rotated {
+      transform: rotate(90deg);
+      width: 86vh;
+      max-width: 86vh;
+      max-height: 92vw;
+    }
+    /* 아이폰 상단 헤더: 제목과 퀵 액션을 한 줄로 배치 */
+    .trip-topline { display:flex; align-items:center; justify-content:space-between; gap:6px; min-width:0; }
+    .trip-title { min-width:0; flex:1 1 auto; margin:0; color:#1E3A5F; font-size:clamp(17px, 4.8vw, 23px); line-height:1.15; font-weight:900; letter-spacing:-.055em; white-space:nowrap; text-shadow:0 1px 0 rgba(255,255,255,.8); }
+    .trip-actions { display:flex; align-items:center; justify-content:flex-end; gap:4px; flex:0 0 auto; }
+    .trip-action { width:32px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:11px; border:1px solid transparent; font-size:17px; line-height:1; transition:transform .15s, background .15s; box-shadow: 0 1px 2px rgba(15, 23, 42, .05); }
+    .trip-action:active { transform:scale(.93); }
+    .trip-action.emergency { color:#991b1b; background:#fef2f2; border-color:#fecaca; }
+    .trip-action.currency { color:#166534; background:#f0fdf4; border-color:#bbf7d0; }
+    .trip-action.settings { color:#334155; background:#ffffff; border-color:#cbd5e1; }
+    .trip-action.sync { color:#166534; background:#f0fdf4; border-color:#bbf7d0; font-size:22px; font-weight:700; }
+    .trip-sync-time { margin:3px 0 0 1px; color:#64748b; font-size:10px; line-height:1.2; font-weight:600; }
+    @media (max-width:380px) {
+      .trip-title { font-size:clamp(14px, 4.8vw, 18px); letter-spacing:-.06em; }
+      .trip-actions { gap:3px; }
+      .trip-action { width:29px; height:32px; font-size:16px; border-radius:10px; }
+      .trip-action.sync { font-size:20px; }
+    }
+
+    /* 최신 모바일 UI 감성: 타이포그래피 · 카드 · 그림자 */
+    html { font-size: 17px; }
+    body {
+      font-size: 1rem;
+      letter-spacing: -0.015em;
+      background:
+        radial-gradient(1200px 600px at 100% -10%, rgba(30,58,95,.06), transparent 60%),
+        radial-gradient(900px 500px at -10% 10%, rgba(200,75,49,.05), transparent 55%),
+        #F7F7F5;
+    }
+    h1, h2, h3 { letter-spacing: -0.025em; }
+    .bg-white {
+      border-color: rgba(15, 23, 42, .07);
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, .04),
+        0 12px 32px -18px rgba(15, 23, 42, .16);
+    }
+    .animate-card { animation: fadeSlideUp .24s cubic-bezier(.22,.68,.32,1) forwards; }
+    .text-\[10px\] { font-size: 12px !important; }
+    .text-\[11px\] { font-size: 13px !important; }
+    .text-xs { font-size: 13.5px !important; }
+    .text-\[13px\] { font-size: 15px !important; }
+    .text-sm { font-size: 15px !important; }
+    .text-\[14px\] { font-size: 16px !important; }
+    .text-\[15px\] { font-size: 17px !important; }
+    .text-base { font-size: 18px !important; }
+    .text-\[17px\] { font-size: 19px !important; }
+    .text-\[18px\] { font-size: 20px !important; }
+    .text-lg { font-size: 20px !important; }
+    .text-\[28px\] { font-size: 31px !important; }
+    .text-\[34px\] { font-size: 37px !important; }
+
+    @media (max-width: 390px) {
+      #weatherBar { gap: 5px; padding-left: 8px; padding-right: 8px; font-size: 10px; }
+      #weatherBar > div:last-child { gap: 7px; }
+      #weatherLocationLabel { max-width: 88px; }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- 상단 고정 헤더 (은은한 쿨 블루-슬레이트 틴트 적용) -->
+  <header class="sticky top-0 z-40 header-tinted-glass" style="padding-top: var(--safe-top);">
+    <div class="max-w-lg mx-auto px-3 sm:px-4 pt-3 pb-2.5">
+      <div class="trip-topline">
+        <h1 class="trip-title">교토 · 오사카 여행 가이드</h1>
+        <div class="trip-actions" aria-label="빠른 메뉴">
+          <button onclick="openModal('emergencyModal')" class="trip-action emergency" title="긴급 연락" aria-label="긴급 연락">🚨</button>
+          <button onclick="openModal('currencyModal')" class="trip-action currency" title="환율 계산기" aria-label="환율 계산기"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="5" width="21" height="14" rx="2.5" fill="#2E9E5B" stroke="#14663A" stroke-width="1.2"/><rect x="4" y="7.3" width="16" height="9.4" rx="1.4" fill="none" stroke="#BFEBD0" stroke-width=".9"/><circle cx="12" cy="12" r="3.3" fill="#BFEBD0" stroke="#14663A" stroke-width=".9"/><text x="12" y="13.6" text-anchor="middle" font-size="4.6" font-weight="800" fill="#14663A" font-family="sans-serif">¥</text><circle cx="5.6" cy="12" r=".9" fill="#BFEBD0"/><circle cx="18.4" cy="12" r=".9" fill="#BFEBD0"/></svg></button>
+          <button id="nav-settings" onclick="openSettingsModal()" class="trip-action settings" title="설정" aria-label="설정">⚙️</button>
+          <button onclick="syncFromGoogleSheet(true)" id="refreshBtn" title="Google 시트 동기화" aria-label="Google 시트 동기화" class="trip-action sync"><span id="refreshIcon" aria-hidden="true">↻</span></button>
+        </div>
+      </div>
+      <p id="lastSyncTimeText" class="trip-sync-time">Google 시트 동기화 준비 중</p>
+
+      <!-- 현재 위치 날씨 위젯: 한 줄 표시 -->
+      <div id="weatherBar" onclick="fetchCurrentLocationWeather(true)" title="탭하여 현재 위치 날씨 갱신" class="mt-2 px-2.5 py-2 rounded-2xl bg-white/85 border border-sky-200/90 shadow-2xs flex flex-nowrap items-center justify-between gap-1.5 text-[11px] text-sky-950 cursor-pointer active:scale-[0.99] transition whitespace-nowrap overflow-hidden">
+        <div class="flex items-center gap-1 min-w-0 shrink">
+          <span id="weatherIcon" class="text-sm leading-none shrink-0">📍</span>
+          <span id="weatherLocationLabel" class="font-extrabold truncate">위치 확인 중</span>
+          <span id="weatherLocationStatus" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="현재 위치 조회 성공"></span>
+        </div>
+        <div class="flex flex-nowrap items-center gap-2 sm:gap-3 font-semibold text-sky-900 shrink-0">
+          <span id="weatherTempText">--°C</span>
+          <span id="weatherWindText">🌬️ --m/s</span>
+          <span id="weatherRainText">💧 --%</span>
+          <span id="weatherSunsetText">🌅 --:--</span>
+        </div>
+      </div>
+
+      <!-- 시트 권한/오프라인 경고 배너 -->
+      <div id="fallbackBanner" class="hidden mt-2 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200/90 text-[11px] text-amber-900 flex items-center justify-between gap-2">
+        <span id="fallbackBannerMsg" class="leading-snug font-medium">
+          시트 연결이 원활하지 않아 저장된 데이터를 표시합니다.
+        </span>
+        <button onclick="openSettingsModal()" class="shrink-0 px-2 py-1 rounded-lg bg-amber-200/80 font-bold text-amber-950">
+          설정
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 컨테이너 -->
+  <main id="mainContainer" class="max-w-lg mx-auto px-4 pt-3.5 space-y-3.5">
+    <!-- 선택된 페이지 렌더링 -->
+  </main>
+
+  <!-- 하단 고정 4탭 네비게이션: 일정&팁 - 번역 - 지출 - 준비물 (은은한 블루-슬레이트 틴트 적용) -->
+  <footer id="bottomFooter" class="fixed bottom-0 inset-x-0 z-30 footer-tinted-glass" style="padding-bottom: var(--safe-bottom);">
+    <nav class="max-w-lg mx-auto px-2 py-1.5 grid grid-cols-4 gap-1" aria-label="하단 메뉴">
+      <button id="nav-schedule" onclick="switchPage('schedule')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
+        <span class="text-base leading-none">🗓️</span>
+        <span class="text-[11px] font-extrabold mt-1 tracking-tight">일정&팁</span>
+      </button>
+      <button id="nav-translate" onclick="switchPage('translate')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
+        <span class="text-base leading-none">🗣️</span>
+        <span class="text-[11px] font-extrabold mt-1 tracking-tight">번역</span>
+      </button>
+      <button id="nav-expense" onclick="switchPage('expense')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
+        <span class="text-base leading-none">💳</span>
+        <span class="text-[11px] font-extrabold mt-1 tracking-tight">지출</span>
+      </button>
+      <button id="nav-packing" onclick="switchPage('packing')" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition">
+        <span class="text-base leading-none">🎒</span>
+        <span class="text-[11px] font-extrabold mt-1 tracking-tight">준비물</span>
+      </button>
+    </nav>
+  </footer>
+
+  <!-- 모달: 설정 및 시트 연동 -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'settingsModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[90vh] overflow-y-auto space-y-4 text-xs" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">⚙️ 설정 및 시트 연동</h2>
+          <p class="text-xs text-stone-500 mt-0.5">일정 시트 ID, 지출 전송 웹앱 URL, 환율을 관리합니다</p>
+        </div>
+        <button onclick="closeModal('settingsModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700">시트 상태</span>
+          <span id="settingsSyncStatus" class="font-extrabold text-[#1E3A5F]">확인 중...</span>
+        </div>
+        <div class="flex items-center justify-between text-stone-500">
+          <span>마지막 동기화</span>
+          <span id="settingsSyncTime">-</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label for="setSheetId" class="block font-extrabold text-stone-800">일정 Google 스프레드시트 ID</label>
+        <input id="setSheetId" type="text" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-300 font-mono text-stone-800 focus:outline-none focus:border-[#1E3A5F]" />
+
+        <label for="setWebhookUrl" class="block font-extrabold text-stone-800 pt-1">지출 시트 저장용 Apps Script 웹앱 URL</label>
+        <input id="setWebhookUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-800 focus:outline-none focus:border-emerald-600" />
+
+        <label for="settingsRateInput" class="block font-extrabold text-stone-800 pt-1">적용 환율 (100엔당 원화)</label>
+        <div class="flex items-center gap-2">
+          <input id="settingsRateInput" type="number" step="0.1" oninput="onSettingsRateInput(this.value)" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-300 font-extrabold text-stone-900 focus:outline-none" />
+          <button type="button" onclick="fetchLiveExchangeRate(true)" class="shrink-0 px-3 py-2.5 rounded-xl bg-emerald-100 text-emerald-950 font-extrabold">최신 환율</button>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="saveSettingsAndSync()" class="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white font-extrabold">저장 및 시트 동기화</button>
+          <button type="button" onclick="resetDefaultSheetId()" class="px-3 py-2.5 rounded-xl bg-stone-200 text-stone-700 font-bold">기본값</button>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-emerald-950 space-y-1.5">
+        <div class="font-extrabold">지출내역 → Google 시트 전송 Apps Script 코드</div>
+        <pre class="p-2.5 rounded-xl bg-white border border-emerald-200 text-[10.5px] overflow-x-auto text-stone-800">function doPost(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("앱지출내역") || ss.insertSheet("앱지출내역");
+  const d = JSON.parse(e.postData.contents);
+  sheet.appendRow([new Date(), d.day, d.category, d.item, d.payment, d.currency, d.amount, d.krwEstimate, d.memo]);
+  return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button" onclick="clearCachedSheetData()" class="flex-1 py-2.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 font-bold">캐시 초기화</button>
+        <button type="button" onclick="openSheetInNewTab()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold">원본 시트 열기 ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달: 일본어 큰글씨 가로화면 확대 뷰어 -->
+  <div id="phraseZoomModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-3" onclick="closeModalOnBackdrop(event, 'phraseZoomModal')">
+    <div id="phraseZoomCard" class="w-full max-w-2xl bg-white rounded-3xl p-5 sm:p-6 shadow-2xl animate-card space-y-3 transition-transform duration-200">
+      <div class="flex items-center justify-between gap-2">
+        <span id="zoomSituationBadge" class="px-3 py-1 rounded-full bg-rose-100 text-rose-900 text-xs font-extrabold"></span>
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleLandscapeRotation()" class="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-extrabold active:scale-95">
+            ↔ 90° 회전
+          </button>
+          <button onclick="closeModal('phraseZoomModal')" class="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-stone-700 font-extrabold">✕</button>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-stone-50 border-2 border-stone-200">
+        <div class="text-[11px] font-bold text-stone-400 mb-1">일본어 (가로 방향으로 크게 보기)</div>
+        <div id="zoomJapaneseText" class="text-[28px] sm:text-[34px] font-extrabold text-stone-900 leading-tight break-words"></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div class="p-3.5 rounded-2xl bg-indigo-50/80 border border-indigo-100">
+          <div class="text-[11px] font-bold text-indigo-500 mb-0.5">한국어 발음</div>
+          <div id="zoomPronunciationText" class="text-[17px] font-bold text-indigo-950 leading-snug"></div>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-100">
+          <div class="text-[11px] font-bold text-emerald-600 mb-0.5">뜻</div>
+          <div id="zoomKoreanText" class="text-[17px] font-extrabold text-emerald-950 leading-snug"></div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button onclick="copyZoomedPhrase()" class="flex-1 py-3 rounded-2xl bg-[#1E3A5F] text-white font-bold text-sm active:scale-[0.98] transition">
+          일본어 문장 복사
+        </button>
+        <button onclick="closeModal('phraseZoomModal')" class="px-5 py-3 rounded-2xl bg-stone-200 text-stone-800 font-bold text-sm active:scale-[0.98] transition">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달: 빠른 환율 계산기 & 조정 -->
+  <div id="currencyModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'currencyModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[90vh] overflow-y-auto" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">💵 엔화 ↔ 원화 계산기</h2>
+          <p id="currentRateSubtitle" class="text-xs text-stone-500 mt-0.5">적용 환율: 100엔 = 900원</p>
+        </div>
+        <button onclick="closeModal('currencyModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/90 mb-3 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <label for="ratePer100Input" class="text-xs font-extrabold text-emerald-950">100엔당 원화 환율 조정</label>
+          <button onclick="fetchLiveExchangeRate(true)" class="px-2.5 py-1 rounded-lg bg-emerald-200/80 hover:bg-emerald-300 text-emerald-950 text-[11px] font-extrabold active:scale-95 transition">
+            🌐 최신 환율 조회
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-stone-600 shrink-0">100 JPY =</span>
+          <input id="ratePer100Input" type="number" step="0.1" inputmode="decimal" oninput="onManualRateChange()" class="w-full px-3 py-2 rounded-xl bg-white border border-emerald-300 text-sm font-extrabold text-stone-900 focus:outline-none" />
+          <span class="text-xs font-bold text-stone-600 shrink-0">원</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="applyPresetRate(880)" class="px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-[11px] font-bold text-emerald-900">880원</button>
+          <button onclick="applyPresetRate(900)" class="px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-[11px] font-bold text-emerald-900">900원</button>
+          <button onclick="applyPresetRate(920)" class="px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-[11px] font-bold text-emerald-900">920원</button>
+          <button onclick="applyPresetRate(950)" class="px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-[11px] font-bold text-emerald-900">950원</button>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200">
+          <div class="flex items-center justify-between mb-1">
+            <label for="jpyInput" class="text-xs font-bold text-stone-500">일본 엔화 (JPY ¥)</label>
+            <button onclick="clearCurrency()" class="text-[11px] px-2 py-0.5 rounded-md bg-stone-200 text-stone-700 font-semibold">초기화</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold text-stone-400">¥</span>
+            <input id="jpyInput" type="number" inputmode="numeric" placeholder="엔화 입력" oninput="onJpyChange()" class="w-full bg-transparent text-2xl font-extrabold text-stone-900 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="addJpy(100)" class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">+100엔</button>
+          <button onclick="addJpy(500)" class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">+500엔</button>
+          <button onclick="addJpy(1000)" class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">+1,000엔</button>
+          <button onclick="addJpy(5000)" class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">+5,000엔</button>
+          <button onclick="addJpy(10000)" class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">+10,000엔</button>
+        </div>
+
+        <div class="bg-[#1E3A5F] text-white p-3.5 rounded-2xl">
+          <label for="krwInput" class="block text-xs font-medium text-blue-200 mb-1">대한민국 원화 (KRW ₩ · 직접 입력 가능)</label>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold text-blue-300">₩</span>
+            <input id="krwInput" type="number" inputmode="numeric" placeholder="원화 입력" oninput="onKrwChange()" class="w-full bg-transparent text-2xl font-extrabold text-white placeholder-blue-300/50 focus:outline-none" />
+            <span class="text-sm font-bold text-blue-100 shrink-0">원</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달: 주변 사진 스팟 -->
+  <div id="photoSpotsModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'photoSpotsModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[90vh] overflow-y-auto" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">📸 주변 사진 스팟</h2>
+          <p class="text-xs text-stone-500 mt-0.5">현재 위치 주변의 인생샷·야경·풍경 명소</p>
+        </div>
+        <button onclick="closeModal('photoSpotsModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <a id="photoMapsNearby" href="https://www.google.com/maps/search/사진+스팟/@35.0116,135.7681,14z" target="_blank" rel="noopener"
+           class="py-3 rounded-2xl bg-[#1E3A5F] text-white text-xs font-extrabold text-center active:scale-[0.98] transition">
+          현재 위치 사진 스팟
+        </a>
+        <a href="https://www.google.com/maps/search/야경+전망/@35.0116,135.7681,14z" target="_blank" rel="noopener"
+           class="py-3 rounded-2xl bg-stone-100 border border-stone-200 text-stone-800 text-xs font-extrabold text-center active:scale-[0.98] transition">
+          야경 · 전망
+        </a>
+      </div>
+      <div class="space-y-2">
+        <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200">
+          <div class="text-sm font-extrabold text-stone-900 mb-1">교토 추천</div>
+          <div class="space-y-1.5 text-xs text-stone-700">
+            <a href="https://www.google.com/maps/search/?api=1&query=기요미즈데라" target="_blank" rel="noopener" class="block py-1.5 px-2.5 rounded-xl bg-white border border-stone-200 font-semibold">기요미즈데라 · 산넨자카</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=아라시야마 도게츠교" target="_blank" rel="noopener" class="block py-1.5 px-2.5 rounded-xl bg-white border border-stone-200 font-semibold">아라시야마 · 도게츠교 · 치쿠린</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=후시미 이나리 신사" target="_blank" rel="noopener" class="block py-1.5 px-2.5 rounded-xl bg-white border border-stone-200 font-semibold">후시미 이나리 · 천본조</a>
+          </div>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200">
+          <div class="text-sm font-extrabold text-stone-900 mb-1">오사카 추천</div>
+          <div class="space-y-1.5 text-xs text-stone-700">
+            <a href="https://www.google.com/maps/search/?api=1&query=도톤보리 글리코 간판" target="_blank" rel="noopener" class="block py-1.5 px-2.5 rounded-xl bg-white border border-stone-200 font-semibold">도톤보리 · 글리코 간판 · 네온</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=우메다 스카이빌딩 공중정원" target="_blank" rel="noopener" class="block py-1.5 px-2.5 rounded-xl bg-white border border-stone-200 font-semibold">우메다 스카이빌딩 · 야경</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=덴포잔 대관람차" target="_blank" rel="noopener" class="block py-1.5 px-2.5 rounded-xl bg-white border border-stone-200 font-semibold">덴포잔 · 대관람차 · 항만 야경</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달: 긴급 연락 및 안전 정보 -->
+  <div id="emergencyModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/45" onclick="closeModalOnBackdrop(event, 'emergencyModal')">
+    <div class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl animate-card max-h-[90vh] overflow-y-auto" style="padding-bottom: calc(24px + var(--safe-bottom));">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h2 class="text-lg font-extrabold text-stone-900">🚨 긴급 연락 &amp; 안전 정보</h2>
+          <p class="text-xs text-stone-500 mt-0.5">일본 여행 중 필요한 긴급 번호와 연락처</p>
+        </div>
+        <button onclick="closeModal('emergencyModal')" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 font-bold">✕</button>
+      </div>
+      <div class="space-y-2.5">
+        <a href="tel:110" class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-red-50 border border-red-200 active:scale-[0.99] transition">
+          <div>
+            <div class="text-sm font-extrabold text-red-900">🚓 경찰 · 범죄 신고</div>
+            <div class="text-xs text-stone-600 mt-0.5">분실, 도난, 사고, 위급 상황</div>
+          </div>
+          <div class="text-xl font-extrabold text-red-700">110</div>
+        </a>
+        <a href="tel:119" class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-orange-50 border border-orange-200 active:scale-[0.99] transition">
+          <div>
+            <div class="text-sm font-extrabold text-orange-900">🚑 소방 · 구급 · 화재</div>
+            <div class="text-xs text-stone-600 mt-0.5">응급환자, 화재, 구조 요청</div>
+          </div>
+          <div class="text-xl font-extrabold text-orange-700">119</div>
+        </a>
+        <a href="tel:+81335803311" class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-blue-50 border border-blue-200 active:scale-[0.99] transition">
+          <div>
+            <div class="text-sm font-extrabold text-blue-900">🇰🇷 주일 대한민국 대사관</div>
+            <div class="text-xs text-stone-600 mt-0.5">여권 분실·사고·긴급 민원 지원</div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-sm font-extrabold text-blue-800">+81 3-3580-3311</div>
+            <div class="text-[10px] text-stone-500">도쿄 · 평일 근무시간</div>
+          </div>
+        </a>
+        <a href="tel:+81752111551" class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-indigo-50 border border-indigo-200 active:scale-[0.99] transition">
+          <div>
+            <div class="text-sm font-extrabold text-indigo-900">🏛️ 주 오사카 대한민국 총영사관</div>
+            <div class="text-xs text-stone-600 mt-0.5">오사카·교토·효고 등 긴급 지원</div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-sm font-extrabold text-indigo-800">+81 75-211-1551</div>
+            <div class="text-[10px] text-stone-500">교토 여행 시 우선 확인</div>
+          </div>
+        </a>
+        <div class="p-4 rounded-2xl bg-stone-50 border border-stone-200">
+          <div class="text-sm font-extrabold text-stone-900 mb-2">🧾 긴급 시 확인할 정보</div>
+          <ul class="space-y-1.5 text-xs text-stone-700">
+            <li>• 여권·항공권 사진을 휴대폰에 저장</li>
+            <li>• 여행자보험 가입 증명 및 24시간 상담 번호 확인</li>
+            <li>• 숙소 이름·주소·전화번호를 미리 저장</li>
+            <li>• 카드 분실 시 카드사 해외 분실 신고 번호 확인</li>
+            <li>• 응급 시 먼저 119에 전화하고, 통역이 필요하면 “통역이 필요합니다”라고 전달</li>
+          </ul>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <a href="https://www.google.com/maps/search/병원+응급실/@35.0116,135.7681,13z" target="_blank" class="py-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-900 text-xs font-extrabold text-center">🏥 근처 병원 찾기</a>
+          <a href="https://www.google.com/maps/search/경찰서/@35.0116,135.7681,13z" target="_blank" class="py-3 rounded-2xl bg-stone-100 border border-stone-200 text-stone-800 text-xs font-extrabold text-center">🚓 근처 경찰서 찾기</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-[70] pointer-events-none opacity-0 transition-opacity duration-200">
+    <div id="toastMsg" class="px-4 py-2 rounded-full bg-stone-900/90 text-white text-xs font-semibold shadow-lg whitespace-nowrap">
+      완료되었습니다
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. 기본 설정 및 스토리지 키 정의
+    // =========================================================================
+    const DEFAULT_SHEET_ID = "11YkJKh9m4RHPTax-AEnu0p99HEwmZSefYSrTzIOCdOw";
+    const SHEET_TABS = {
+      SCHEDULE: "여행 일정표",
+      TIPS: "일차별 유의사항 및 팁",
+      DIAGNOSIS: "일정 점검 및 대안",
+      PACKING: "여행 준비물"
+    };
+
+    const STORAGE_KEYS = {
+      SHEET_ID: "ko_trip_sheet_id_v3",
+      EXPENSE_WEBHOOK: "ko_trip_expense_webhook_v2",
+      RATE_PER_100: "ko_trip_rate_per_100_v2",
+      CACHED_DATA: "ko_trip_cached_payload_v3",
+      LAST_SYNC: "ko_trip_last_sync_v3",
+      ACTIVE_PAGE: "ko_trip_active_page_v1",
+      DAY_INDEX: "ko_trip_day_index_v1",
+      CHECKS: "ko_trip_checks_v3",
+      STEPS: "ko_trip_steps_v3",
+      PACKING_CHECKS: "ko_trip_packing_checks_v3",
+      ACCORDION: "ko_trip_accordion_v3",
+      EXPENSES: "ko_trip_expenses_v2"
+    };
+
+    // 아이 식기 요청을 제외한 19개 일본어 회화
+    const JAPANESE_PHRASES = [
+      { id: 1, category: "택시", situation: "1일차: 교토역 → 호텔", japanese: "京王プレリアホテル京都烏丸五条までお願いします。", pronunciation: "게이오 프레리아 호텔 교토 가라스마 고조마데 오네가이시마스", korean: "게이오 프렐리아 호텔 교토 가라스마 고조까지 부탁드립니다." },
+      { id: 2, category: "택시", situation: "2일차: 호텔 → 청수사", japanese: "清水寺（五条坂）までお願いします。", pronunciation: "기요미즈데라(고조자카)마데 오네가이시마스", korean: "기요미즈데라(고조자카)까지 부탁드립니다." },
+      { id: 3, category: "택시", situation: "2일차: 청수사 → 시조오미야역", japanese: "嵐電の四条大宮駅までお願いします。", pronunciation: "란덴노 시조오미야에키마데 오네가이시마스", korean: "란덴 시조오미야역까지 부탁드립니다." },
+      { id: 4, category: "택시", situation: "3일차: 호텔 → 교토역", japanese: "京都駅の中央口までお願いします。", pronunciation: "교토에키노 추오구치마데 오네가이시마스", korean: "교토역 중앙 출구까지 부탁드립니다." },
+      { id: 5, category: "택시", situation: "6일차: 호텔 → 난바 OCAT", japanese: "なんばOCAT（オーキャット）までお願いします。", pronunciation: "난바 오캿토마데 오네가이시마스", korean: "난바 OCAT까지 부탁드립니다." },
+      { id: 6, category: "택시", situation: "트렁크 짐 싣기", japanese: "トランクを開けていただけますか。", pronunciation: "도란쿠오 아케테 이타다케마스카", korean: "트렁크 좀 열어주실 수 있나요?" },
+      { id: 7, category: "택시", situation: "카드/교통카드 결제", japanese: "クレジットカード（Suica）で払えますか。", pronunciation: "쿠레짓토카도(스이카)데 하라에마스카", korean: "신용카드(스이카)로 결제할 수 있나요?" },
+      { id: 8, category: "택시", situation: "하차 요청", japanese: "ここで降ろしてください。", pronunciation: "코코데 오로시테 쿠다사이", korean: "여기서 내려주세요." },
+      { id: 9, category: "호텔", situation: "체크인", japanese: "チェックインをお願いします。予約した〇〇です。", pronunciation: "쳇쿠인오 오네가이시마스. 요야쿠시타 (이름)데스", korean: "체크인 부탁드립니다. 예약한 (이름)입니다." },
+      { id: 10, category: "호텔", situation: "대욕장 안내 문의", japanese: "大浴場は何階にありますか。暗証番号は何番ですか。", pronunciation: "다이요쿠조와 난가이니 아리마스카. 안쇼반고와 난반데스카", korean: "대욕장은 몇 층에 있나요? 비밀번호는 몇 번인가요?" },
+      { id: 11, category: "호텔", situation: "어메니티/수건 추가", japanese: "タオルをもう一枚いただけますか。", pronunciation: "타오루오 모 이치마이 이타다케마스카", korean: "수건 한 장 더 주실 수 있나요?" },
+      { id: 12, category: "호텔", situation: "체크아웃 후 짐 보관", japanese: "チェックアウト後も荷物を預かってもらえますか。", pronunciation: "쳇쿠아우토고모 니모츠오 아즈캇테 모라에마스카", korean: "체크아웃 후에도 짐을 맡아주실 수 있나요?" },
+      { id: 13, category: "호텔", situation: "택시 호출 요청", japanese: "タクシーを呼んでいただけますか。", pronunciation: "타쿠시오 욘데 이타다케마스카", korean: "택시 좀 불러주실 수 있나요?" },
+      { id: 14, category: "식당", situation: "인원 말하기 (3명)", japanese: "大人2人、子供1人です。", pronunciation: "오토나 후타리, 코도모 히토리데스", korean: "어른 2명, 아이 1명입니다." },
+      { id: 15, category: "식당", situation: "메뉴판/한국어 메뉴", japanese: "韓国語のメニューはありますか。", pronunciation: "칸코쿠고노 메뉴와 아리마스카", korean: "한국어 메뉴판이 있나요?" },
+      { id: 16, category: "식당", situation: "주문하기", japanese: "すみません、注文お願いします。これとこれをください。", pronunciation: "스미마센, 추몬 오네가이시마스. 코레토 코레오 쿠다사이", korean: "저기요, 주문 부탁합니다. 이것과 이것 주세요." },
+      { id: 17, category: "식당", situation: "계산하기", japanese: "お会計をお願いします。別々ではなく一緒でお願いします。", pronunciation: "오카이케오 오네가이시마스. 베츠베츠데와 나쿠 잇쇼데 오네가이시마스", korean: "계산 부탁드립니다. 따로가 아니라 한 번에 계산할게요." },
+      { id: 18, category: "기타/쇼핑", situation: "교토역 코인락커 찾기", japanese: "コインロッカーはどこにありますか。", pronunciation: "코인롯카와 도코니 아리마스카", korean: "코인락커는 어디에 있나요?" },
+      { id: 19, category: "기타/쇼핑", situation: "돈키호테 면세 요청", japanese: "免税（タックスフリー）でお願いします。", pronunciation: "멘제(탁쿠스후리)데 오네가이시마스", korean: "면세로 부탁드립니다." }
+    ];
+
+    // =========================================================================
+    // 2. 기본 내장 데이터 (시트 미연결/오프라인 폴백)
+    // =========================================================================
+    const FALLBACK_DAYS = [
+      {
+        day: 1, dateLabel: "1/10 (일)", shortDate: "1/10(일)", region: "간사이 → 교토",
+        title: "간사이 입국(15:30) & 교토 이동 · 대욕장 휴식",
+        summary: "15:30 간사이공항 도착 → 하루카 특급 이동 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
+        routeText: "15:30 간사이공항 도착 → 무인 발권기 하루카 지정석 교환 및 교토역 이동 → 교토역 창구 자녀 어린이용 교통카드 발급 → 교토역 앞 택시 탑승 및 호텔 직행 → 게이오 프렐리아 호텔 체크인 & 대욕장 휴식",
+        hotel: "게이오 프렐리아 호텔 교토 가라스마 고조", transport: "하루카 특급열차 + 교토역→호텔 택시", fatigueLevel: "낮음",
+        coreTips: [
+          "15:30 간사이공항 도착 후 여권 마크가 부착된 무인 발권기에서 하루카 QR 스캔 후 지정석 교환 (전원 실물 여권 필수)",
+          "게이오 프렐리아 호텔 체크인 후 대욕장에서 휴식"
+        ],
+        transitTips: [
+          "교토역→호텔 이동: 30번 승강장 하차 후 중앙 개찰구 나와 택시 승강장에서 호텔 직행 (약 5분, 약 800엔)"
+        ],
+        ticketTips: [
+          "[어린이 교통카드] 교토역 창구에서 자녀 여권+현금 2,000엔으로 어린이용 실물 교통카드 발급"
+        ],
+        diagnosis: "이동 위주로 구성되어 초반 컨디션 유지에 적합합니다.",
+        alternatives: ["도착 지연 시 호텔 앞 편의점 또는 교토역 도시락 활용"],
+        checklist: ["전원 실물 여권", "Visit Japan Web QR", "하루카 모바일 예매 QR", "초기 현금 약 10,000~12,000엔"]
+      },
+      {
+        day: 2, dateLabel: "1/11 (월)", shortDate: "1/11(월)", region: "교토 핵심 투어",
+        title: "청수사(기요미즈데라) & 아라시야마",
+        summary: "오전 기요미즈데라(청수사)·산넨자카 → 란덴 전철 → 오후 아라시야마(치쿠린·도게츠교) & 대욕장 휴식",
+        routeText: "호텔 출발(택시) → 기요미즈데라 및 산넨자카 관람 → 점심 식사 → 택시로 란덴 시조오미야역 직행 → 란덴 전철 탑승 및 아라시야마 이동 → 치쿠린 & 도게츠교 산책 → JR 사가아라시야마역 → 교토역 → 고조역(호텔 복귀 & 대욕장)",
+        hotel: "게이오 프렐리아 호텔 교토 가라스마 고조", transport: "교토 시내 택시 + 란덴 전철 + JR 사가노선 & 지하철", fatigueLevel: "중 ~ 높음",
+        coreTips: [
+          "청수사 오르막길은 오전 이른 시간 방문 권장",
+          "[란덴 전철] 시조오미야역 시발역 배차 간격 약 10분"
+        ],
+        transitTips: [
+          "청수사→란덴 시조오미야역 이동 시 택시 활용으로 체력 절약"
+        ],
+        ticketTips: [
+          "기요미즈데라: 성인 500엔, 초등 200엔 / 란덴 전철: 성인 250엔, 초등 120엔"
+        ],
+        diagnosis: "동서 이동 및 경사로 도보가 있어 일몰 전 복귀 동선 관리가 중요합니다.",
+        alternatives: ["[오후 컷오프] 16시경 사가아라시야마역 복귀 목표"],
+        checklist: ["사찰 입장료용 엔화 현금", "어린이 교통카드 & 모바일 Suica", "편한 운동화", "방한 외투·목도리·핫팩"]
+      },
+      {
+        day: 3, dateLabel: "1/12 (화)", shortDate: "1/12(화)", region: "교토 → 오사카",
+        title: "후시미 이나리 · 우지 · 도톤보리 크루즈",
+        summary: "후시미 이나리 신사 → 우지(뵤도인·말차 거리) → JR 신쾌속 오사카 이동 → 난바 코코호텔 체크인 & 도톤보리 크루즈·돈키호테 1차 쇼핑",
+        routeText: "호텔 체크아웃 & 택시 교토역 이동(코인락커 짐 보관) → JR 나라선 후시미 이나리 신사 → JR 나라선 우지 뵤도인 & 말차 거리 → 교토역 짐 회수 → JR 신쾌속 & 미도스지선 → 난바 코코호텔 체크인 → 도톤보리 크루즈 & 돈키호테 1차 쇼핑",
+        hotel: "난바 코코호텔", transport: "호텔→교토역 택시 + JR 나라선 + JR 신쾌속 + 오사카 메트로", fatigueLevel: "높음",
+        coreTips: [
+          "체크아웃 후 택시로 교토역 이동(약 5분), 코인락커 짐 보관 후 이동",
+          "돈키호테 면세 시 전원 실물 여권 필수"
+        ],
+        transitTips: [
+          "교토역→이나리역→우지역 JR 나라선 직결 동선 활용"
+        ],
+        ticketTips: [
+          "뵤도인 정원+호쇼칸: 성인 700엔, 초·중 300엔 / 톤보리 크루즈: 성인 2,000엔, 초등 1,000엔"
+        ],
+        diagnosis: "이동과 일정이 집중되므로 중간 휴식 시간을 확보하는 것이 좋습니다.",
+        alternatives: ["후시미 이나리 오쿠샤 봉배소까지만 짧게 관람"],
+        checklist: ["난바 코코호텔 바우처", "100엔 동전", "전원 실물 여권", "접이식 장바구니"]
+      },
+      {
+        day: 4, dateLabel: "1/13 (수)", shortDate: "1/13(수)", region: "오사카 북부·중부",
+        title: "컵누들뮤지엄 · 과학관 · 우메다 야경",
+        summary: "오전 컵누들뮤지엄(마이 컵누들 팩토리) → 오후 국립국제미술관 & 시립 과학관 → 저녁 우메다 야경 & 돈키호테 2차 면세 쇼핑",
+        routeText: "난바역 → 우메다역 → 한큐 다카라즈카선 이케다역 컵누들뮤지엄 → 오사카우메다 복귀 및 점심 → 나카노시마(국립국제미술관 & 오사카시립 과학관) → 우메다 스카이빌딩 야경 & 돈키호테 2차 쇼핑 → 난바 코코호텔 복귀",
+        hotel: "난바 코코호텔", transport: "오사카 메트로 + 한큐 다카라즈카선", fatigueLevel: "중 ~ 높음",
+        coreTips: [
+          "마이 컵누들 팩토리 체험(1인 500엔) 및 과학관 플라네타리움 시간 확인"
+        ],
+        transitTips: [
+          "난바→우메다(미도스지선)→이케다(한큐 다카라즈카선)"
+        ],
+        ticketTips: [
+          "컵누들 만들기 1인 500엔 / 과학관 상설전 초·중 무료, 성인 400엔"
+        ],
+        diagnosis: "실내 체험 위주 일정으로 날씨 영향이 적습니다.",
+        alternatives: ["오전 체험을 11:30경 마무리해 점심 이동 여유 확보"],
+        checklist: ["전원 실물 여권", "교통카드 잔액", "방한 외투·장갑"]
+      },
+      {
+        day: 5, dateLabel: "1/14 (목)", shortDate: "1/14(목)", region: "오사카 동부·항만",
+        title: "오사카성 · 해유관(수족관) · 덴포잔",
+        summary: "오전 오사카성(천수각·성곽 산책) → 오후 해유관(수족관) & 덴포잔 대관람차 야경 → 도톤보리 저녁 식사",
+        routeText: "난바역 → 다니마치욘초메역 → 오사카성 공원 & 천수각 → 모리노미야역 점심 → 주오선 오사카코역 해유관 → 덴포잔 마켓플레이스 & 대관람차 야경 → 난바 복귀 및 도톤보리 저녁",
+        hotel: "난바 코코호텔", transport: "오사카 메트로 다니마치선·주오선·미도스지선", fatigueLevel: "보통 ~ 중",
+        coreTips: [
+          "오사카성 공원 로드 트레인 활용 및 천수각 5층까지 엘리베이터 이용 권장",
+          "해유관 사전 예매 QR 확인"
+        ],
+        transitTips: [
+          "모리노미야역→오사카코역 주오선 직행"
+        ],
+        ticketTips: [
+          "천수각: 성인 600엔, 중학생 이하 무료 / 해유관: 성인 2,700엔, 초등 1,400엔"
+        ],
+        diagnosis: "성곽 산책과 실내 수족관·관람차로 구성된 균형 잡힌 일정입니다.",
+        alternatives: ["덴포잔 바람이 강하거나 피곤 시 대관람차 생략 가능"],
+        checklist: ["해유관 QR 바우처", "방한 외투·핫팩", "교통카드"]
+      },
+      {
+        day: 6, dateLabel: "1/15 (금)", shortDate: "1/15(금)", region: "오사카 → 귀국",
+        title: "난바 야사카 신사 산책 & 공항 리무진 귀국",
+        summary: "호텔 조식 후 난바 야사카 신사 산책 & 체크아웃 → 난바 OCAT 리무진버스 탑승 → 16:30 간사이공항 출발 귀국",
+        routeText: "호텔 조식 후 난바 야사카 신사 산책 → 체크아웃 및 짐 점검 → 택시로 난바 OCAT 이동 → 간사이공항 리무진버스 탑승 → 16:30 간사이공항 출발 귀국",
+        hotel: "귀국", transport: "택시 + 간사이공항 리무진버스 (난바 OCAT → 간사이공항)", fatigueLevel: "낮음",
+        coreTips: [
+          "16:30 출발편이므로 13:30~14:00 공항 도착 목표로 OCAT 리무진버스 탑승",
+          "보조배터리 기내 휴대 필수"
+        ],
+        transitTips: [
+          "코코호텔 앞 택시로 난바 OCAT 이동 후 2층 버스 승차"
+        ],
+        ticketTips: [
+          "OCAT→간사이공항 리무진버스: 성인 1,300엔, 어린이 650엔"
+        ],
+        diagnosis: "여유로운 마무리 후 리무진버스로 직행하는 안정적인 귀국 일정입니다.",
+        alternatives: ["우천 시 신사 산책 생략 후 바로 OCAT 이동"],
+        checklist: ["전원 실물 여권 & 항공권", "보조배터리 기내 휴대", "남은 엔화 현금"]
+      }
+    ];
+
+    const FALLBACK_PACKING = [
+      { id: "p_0", category: "서류/결제", item: "전원 실물 여권", qty: "3인", tip: "발권·교통카드·면세 시 필수", sheetChecked: false },
+      { id: "p_1", category: "서류/결제", item: "Visit Japan Web QR", qty: "3인분", tip: "입국·세관 QR 스크린샷 저장", sheetChecked: false },
+      { id: "p_2", category: "서류/결제", item: "엔화 현금(1,000엔권 위주)", qty: "약 3~4만엔", tip: "입장료·코인락커·충전용", sheetChecked: false },
+      { id: "p_3", category: "예약/교통", item: "하루카 & 해유관 QR", qty: "성인2+초등1", tip: "예매 내역 및 입장 시간 확인", sheetChecked: false },
+      { id: "p_4", category: "방한/전자", item: "방한 외투·핫팩·보조배터리", qty: "3인", tip: "보조배터리는 반드시 기내 휴대", sheetChecked: false }
+    ];
+
+    // =========================================================================
+    // 3. 애플리케이션 전역 상태
+    // =========================================================================
+    let state = {
+      sheetId: DEFAULT_SHEET_ID,
+      expenseWebhookUrl: "",
+      ratePer100: 900,
+      days: JSON.parse(JSON.stringify(FALLBACK_DAYS)),
+      packing: JSON.parse(JSON.stringify(FALLBACK_PACKING)),
+      activePage: "schedule", // 'schedule' | 'translate' | 'expense' | 'packing'
+      dayIndex: 0,            // 0~5 (Day 1~6)
+      packingCategoryFilter: "전체",
+      phraseCategoryFilter: "전체",
+      zoomedPhrase: null,
+      isRotatedLandscape: false,
+      syncMode: "loading",
+      lastSyncTime: null,
+      checks: {},
+      steps: {},
+      packingChecks: {},
+      expenses: [],
+      accordion: {
+        timeline: true,
+        coreTips: true,
+        transitTips: true,
+        ticketTips: false,
+        diagnosis: false
+      },
+      weather: {
+        locationName: "교토",
+        temp: null,
+        feelsLike: null,
+        windSpeed: null,
+        rainProb: null,
+        sunset: null,
+        icon: "📍"
+      }
+    };
+
+    // =========================================================================
+    // 4. 현재 시각 기준 일차 산정 & 로컬 저장소
+    // =========================================================================
+    function computeInitialDayIndex() {
+      const now = new Date();
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tripStart = new Date(2027, 0, 10);
+      const tripEnd = new Date(2027, 0, 15);
+      if (todayMidnight < tripStart || todayMidnight > tripEnd) return 0;
+      const diff = Math.floor((todayMidnight - tripStart) / (1000 * 60 * 60 * 24));
+      return Math.min(Math.max(diff, 0), 5);
+    }
+
+    function loadLocalState() {
+      try {
+        const savedSheetId = localStorage.getItem(STORAGE_KEYS.SHEET_ID);
+        if (savedSheetId && savedSheetId.trim()) state.sheetId = savedSheetId.trim();
+
+        const savedWebhook = localStorage.getItem(STORAGE_KEYS.EXPENSE_WEBHOOK);
+        if (savedWebhook) state.expenseWebhookUrl = savedWebhook.trim();
+
+        const savedRate = parseFloat(localStorage.getItem(STORAGE_KEYS.RATE_PER_100));
+        if (!isNaN(savedRate) && savedRate > 0) state.ratePer100 = savedRate;
+
+        const savedPage = localStorage.getItem(STORAGE_KEYS.ACTIVE_PAGE);
+        if (savedPage && ["schedule", "translate", "expense", "packing"].includes(savedPage)) {
+          state.activePage = savedPage;
+        }
+
+        const savedChecks = localStorage.getItem(STORAGE_KEYS.CHECKS);
+        if (savedChecks) state.checks = JSON.parse(savedChecks);
+
+        const savedSteps = localStorage.getItem(STORAGE_KEYS.STEPS);
+        if (savedSteps) state.steps = JSON.parse(savedSteps);
+
+        const savedPackingChecks = localStorage.getItem(STORAGE_KEYS.PACKING_CHECKS);
+        if (savedPackingChecks) state.packingChecks = JSON.parse(savedPackingChecks);
+
+        const savedExpenses = localStorage.getItem(STORAGE_KEYS.EXPENSES);
+        if (savedExpenses) state.expenses = JSON.parse(savedExpenses);
+
+        const savedAcc = localStorage.getItem(STORAGE_KEYS.ACCORDION);
+        if (savedAcc) state.accordion = { ...state.accordion, ...JSON.parse(savedAcc) };
+
+        const cachedPayload = localStorage.getItem(STORAGE_KEYS.CACHED_DATA);
+        const lastSync = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
+        if (cachedPayload) {
+          const parsed = JSON.parse(cachedPayload);
+          if (parsed.days && parsed.days.length === 6) state.days = parsed.days;
+          if (parsed.packing && parsed.packing.length > 0) state.packing = parsed.packing;
+          state.syncMode = "cache";
+          state.lastSyncTime = lastSync || null;
+        } else {
+          state.syncMode = "fallback";
+        }
+
+        state.dayIndex = computeInitialDayIndex();
+      } catch (e) {
+        console.warn("상태 복원 오류:", e);
+        state.dayIndex = 0;
+      }
+    }
+
+    function saveLocalPreferences() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.SHEET_ID, state.sheetId);
+        localStorage.setItem(STORAGE_KEYS.EXPENSE_WEBHOOK, state.expenseWebhookUrl);
+        localStorage.setItem(STORAGE_KEYS.RATE_PER_100, String(state.ratePer100));
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_PAGE, state.activePage);
+        localStorage.setItem(STORAGE_KEYS.CHECKS, JSON.stringify(state.checks));
+        localStorage.setItem(STORAGE_KEYS.STEPS, JSON.stringify(state.steps));
+        localStorage.setItem(STORAGE_KEYS.PACKING_CHECKS, JSON.stringify(state.packingChecks));
+        localStorage.setItem(STORAGE_KEYS.ACCORDION, JSON.stringify(state.accordion));
+        localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(state.expenses));
+      } catch (e) {
+        console.warn("상태 저장 오류:", e);
+      }
+    }
+
+    // =========================================================================
+    // 5. 현재 위치 기반 날씨 (기온 · 강수확률 · 일몰시각)
+    // =========================================================================
+    function getWeatherIcon(code) {
+      if (code === 0) return "☀️";
+      if ([1, 2].includes(code)) return "🌤️";
+      if (code === 3) return "☁️";
+      if ([45, 48].includes(code)) return "🌫️";
+      if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return "🌧️";
+      if ([71, 73, 75, 77, 85, 86].includes(code)) return "❄️";
+      if ([95, 96, 99].includes(code)) return "⛈️";
+      return "🌤️";
+    }
+
+    async function loadWeatherByCoords(lat, lon, labelText = "현재 위치", isManual = false) {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,weather_code&daily=precipitation_probability_max,sunset&timezone=auto&forecast_days=1`;
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error("Weather API failed");
+        const data = await res.json();
+
+        const temp = data.current?.temperature_2m;
+        const windSpeed = data.current?.wind_speed_10m;
+        const code = data.current?.weather_code ?? 1;
+        const rainProb = data.daily?.precipitation_probability_max?.[0] ?? 0;
+        const sunsetRaw = data.daily?.sunset?.[0] || "";
+        const sunsetTime = sunsetRaw.includes("T") ? sunsetRaw.split("T")[1].slice(0, 5) : "--:--";
+
+        state.weather = {
+          locationName: labelText,
+          temp: typeof temp === "number" ? `${Math.round(temp)}°C` : "--°C",
+          windSpeed: typeof windSpeed === "number" ? `${windSpeed.toFixed(1)}m/s` : "--m/s",
+          rainProb: `${rainProb}%`,
+          sunset: sunsetTime,
+          icon: getWeatherIcon(code)
+        };
+        renderWeatherBar();
+        if (isManual) showToast(`${labelText} 날씨를 업데이트했습니다.`);
+      } catch (e) {
+        if (labelText !== "오사카") {
+          loadWeatherByCoords(34.6937, 135.5023, "오사카", isManual);
+          return;
+        }
+        state.weather = {
+          locationName: "오사카",
+          temp: "--°C",
+          windSpeed: "--m/s",
+          rainProb: "--%",
+          sunset: "--:--",
+          icon: "📍",
+          locationVerified: false
+        };
+        renderWeatherBar();
+        if (isManual) showToast("날씨 정보를 불러오지 못했습니다.");
+      }
+    }
+
+    function fetchCurrentLocationWeather(isManual = false) {
+      state.weather.temp = "--°C";
+      state.weather.windSpeed = "--m/s";
+      state.weather.locationName = "위치 확인 중";
+      state.weather.locationVerified = false;
+      renderWeatherBar();
+
+      const fallbackToOsaka = (reason = "") => {
+        loadWeatherByCoords(34.6937, 135.5023, "오사카", isManual);
+        if (isManual && reason) showToast(reason + " · 오사카 날씨를 표시합니다.");
+      };
+
+      if (!navigator.geolocation) {
+        fallbackToOsaka("이 브라우저는 위치 정보를 지원하지 않습니다");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          let placeLabel = "";
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1&accept-language=ko`);
+            if (geoRes.ok) {
+              const geo = await geoRes.json();
+              const a = geo.address || {};
+              const city = a.city || a.town || a.village || a.municipality || a.county || a.state;
+              const district = a.city_district || a.suburb || a.borough || a.quarter || a.neighbourhood;
+              if (city && district && city !== district) placeLabel = `${city} ${district}`;
+              else if (city) placeLabel = city;
+              else if (district) placeLabel = district;
+              else if (geo.name) placeLabel = geo.name;
+            }
+          } catch (_) {}
+          if (!placeLabel) {
+            fallbackToOsaka("도시명을 확인할 수 없습니다");
+            return;
+          }
+          loadWeatherByCoords(latitude, longitude, placeLabel, isManual).then(() => {
+            if (state.weather.locationName === placeLabel) {
+              state.weather.locationVerified = true;
+              renderWeatherBar();
+            }
+          });
+        },
+        (error) => {
+          const reason = error?.code === 1 ? "위치 권한이 차단되어 있습니다" : "현재 위치를 확인할 수 없습니다";
+          fallbackToOsaka(reason);
+        },
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 120000 }
+      );
+    }
+
+    function renderWeatherBar() {
+      document.getElementById("weatherIcon").textContent = state.weather.icon;
+      document.getElementById("weatherLocationLabel").textContent = state.weather.locationName || "위치 확인 중";
+      const locationStatus = document.getElementById("weatherLocationStatus");
+      if (locationStatus) locationStatus.classList.toggle("hidden", !state.weather.locationVerified);
+      document.getElementById("weatherTempText").textContent = state.weather.temp ?? "--°C";
+      document.getElementById("weatherWindText").textContent = `🌬️ ${state.weather.windSpeed ?? "--m/s"}`;
+      document.getElementById("weatherRainText").textContent = `💧 ${state.weather.rainProb ?? "-%"}`;
+      document.getElementById("weatherSunsetText").textContent = `🌅 ${state.weather.sunset ?? "--:--"}`;
+    }
+
+    // =========================================================================
+    // 6. 환율 조회 (다중 API 폴백) 및 수동 조정
+    // =========================================================================
+    function getRatePerYen() {
+      return (Number(state.ratePer100) || 900) / 100;
+    }
+
+    function updateRateLabels() {
+      const r100 = Number(state.ratePer100) || 900;
+      const fmt = Number.isInteger(r100) ? String(r100) : r100.toFixed(1);
+      const headerLabel = document.getElementById("headerRateLabel");
+      const subtitle = document.getElementById("currentRateSubtitle");
+      const modalInput = document.getElementById("ratePer100Input");
+      const settingsInput = document.getElementById("settingsRateInput");
+
+      if (headerLabel) headerLabel.textContent = `${fmt}원`;
+      if (subtitle) subtitle.textContent = `적용 환율: 100엔 = ${fmt}원 (1엔 = ${(r100 / 100).toFixed(2)}원)`;
+      if (modalInput && document.activeElement !== modalInput) modalInput.value = fmt;
+      if (settingsInput && document.activeElement !== settingsInput) settingsInput.value = fmt;
+    }
+
+    async function fetchLiveExchangeRate(isManual = false) {
+      const providers = [
+        async () => {
+          const r = await fetch("https://open.er-api.com/v4/latest/JPY", { cache: "no-store" });
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          const krw = Number(d?.rates?.KRW);
+          if (!krw || krw <= 0) throw new Error();
+          return krw;
+        },
+        async () => {
+          const r = await fetch("https://api.frankfurter.app/latest?from=JPY&to=KRW", { cache: "no-store" });
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          const krw = Number(d?.rates?.KRW);
+          if (!krw || krw <= 0) throw new Error();
+          return krw;
+        },
+        async () => {
+          const r = await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/jpy.json", { cache: "no-store" });
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          const krw = Number(d?.jpy?.krw);
+          if (!krw || krw <= 0) throw new Error();
+          return krw;
+        }
+      ];
+
+      for (const fn of providers) {
+        try {
+          const krwPerJpy = await fn();
+          const per100 = Math.round(krwPerJpy * 1000) / 10;
+          state.ratePer100 = per100;
+          saveLocalPreferences();
+          updateRateLabels();
+          onJpyChange();
+          if (state.activePage === "expense") renderPage();
+          if (isManual) showToast(`🌐 최신 환율 적용: 100엔 = ${per100}원`);
+          return;
+        } catch (_) {}
+      }
+
+      if (isManual) showToast("⚠️ 환율 서버 응답이 없어 수동 입력값을 유지합니다.");
+    }
+
+    // =========================================================================
+    // 7. Google 시트 연결 (gviz JSON + CSV Export + JSONP 폴백)
+    // =========================================================================
+    function sanitizeTimeStrings(rawText) {
+      if (!rawText) return "";
+      return String(rawText)
+        .replace(/(\d{1,2})::+(\d{2})/g, "$1:$2")
+        .replace(/\(\s*:\d{2}\s*\)/g, "")
+        .replace(/(^|[^\d:])\s*:\d{2}(?=\s|$|[,·/)\]}→])/g, "$1")
+        .replace(/[ \t]{2,}/g, " ")
+        .replace(/\(\s*\)/g, "")
+        .trim();
+    }
+
+    function parseGvizResponseText(rawText) {
+      const startIdx = rawText.indexOf("{");
+      const endIdx = rawText.lastIndexOf("}");
+      if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) throw new Error("INVALID_GVIZ");
+      const parsed = JSON.parse(rawText.substring(startIdx, endIdx + 1));
+      if (parsed.status === "error") throw new Error("GVIZ_ERROR");
+      return parsed.table;
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let cur = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === "," && !inQuotes) {
+          result.push(cur);
+          cur = "";
+        } else {
+          cur += ch;
+        }
+      }
+      result.push(cur);
+      return result;
+    }
+
+    function csvToTable(csvText) {
+      if (!csvText || csvText.trim().startsWith("<!DOCTYPE html") || csvText.includes("accounts.google.com")) {
+        throw new Error("PRIVATE_SHEET");
+      }
+      const rows = csvText.split(/\r?\n/).filter(r => r.length > 0).map(line => {
+        const cols = parseCsvLine(line);
+        return { c: cols.map(val => ({ v: sanitizeTimeStrings(val) })) };
+      });
+      return { rows };
+    }
+
+    function fetchJsonpTab(sheetId, tabName) {
+      return new Promise((resolve, reject) => {
+        const cbName = `gvizCb_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+        const script = document.createElement("script");
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error("JSONP_TIMEOUT"));
+        }, 8000);
+
+        function cleanup() {
+          clearTimeout(timer);
+          if (script.parentNode) script.parentNode.removeChild(script);
+          delete window[cbName];
+        }
+
+        window[cbName] = (resp) => {
+          cleanup();
+          if (!resp || resp.status === "error") {
+            reject(new Error("PRIVATE_SHEET"));
+          } else {
+            resolve(resp.table);
+          }
+        };
+
+        script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:json;responseHandler:${cbName}&sheet=${encodeURIComponent(tabName)}`;
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("JSONP_ERROR"));
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    async function fetchSingleTab(sheetId, tabName) {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}`;
+        const res = await fetch(url, { cache: "no-store" });
+        if (res.ok) {
+          const text = await res.text();
+          if (!text.trim().startsWith("<!DOCTYPE html") && !text.includes("accounts.google.com")) {
+            return parseGvizResponseText(text);
+          }
+        }
+      } catch (_) {}
+
+      try {
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+        const res = await fetch(csvUrl, { cache: "no-store" });
+        if (res.ok) {
+          const csvText = await res.text();
+          return csvToTable(csvText);
+        }
+      } catch (_) {}
+
+      return await fetchJsonpTab(sheetId, tabName);
+    }
+
+    function getCellText(row, colIndex) {
+      if (!row || !row.c || !row.c[colIndex]) return "";
+      const cell = row.c[colIndex];
+      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") return sanitizeTimeStrings(String(cell.f).trim());
+      if (cell.v !== undefined && cell.v !== null) return sanitizeTimeStrings(String(cell.v).trim());
+      return "";
+    }
+
+    function getCellBool(row, colIndex) {
+      if (!row || !row.c || !row.c[colIndex]) return false;
+      const str = String(row.c[colIndex].v ?? "").trim().toUpperCase();
+      return str === "TRUE" || str === "O" || str === "Y" || str === "완료";
+    }
+
+    function splitMultilineItems(text) {
+      const s = sanitizeTimeStrings(text);
+      if (!s) return [];
+      return s.split(/\r?\n/).map(l => sanitizeTimeStrings(l.replace(/^[\s•·▪\-*]+/, "").trim())).filter(l => l && l !== "-" && l !== "없음");
+    }
+
+    function splitRouteSteps(text) {
+      const s = sanitizeTimeStrings(text);
+      if (!s) return [];
+      const parts = s.includes("→") ? s.split(/\s*→\s*|\r?\n+/) : s.split(/\r?\n+/);
+      return parts.map(p => sanitizeTimeStrings(p.replace(/^[\s•·\-*\d.]+/, "").trim())).filter(p => p.length > 1);
+    }
+
+    function extractDayNumber(str) {
+      if (!str) return null;
+      const m = String(str).trim().match(/^(?:day\s*)?([1-6])(?:일차|일)?$/i);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
+    async function syncFromGoogleSheet(isManual = false) {
+      const icon = document.getElementById("refreshIcon");
+      if (icon) icon.classList.add("spin-loading");
+
+      try {
+        const [scheduleRes, tipsRes, diagnosisRes, packingRes] = await Promise.allSettled([
+          fetchSingleTab(state.sheetId, SHEET_TABS.SCHEDULE),
+          fetchSingleTab(state.sheetId, SHEET_TABS.TIPS),
+          fetchSingleTab(state.sheetId, SHEET_TABS.DIAGNOSIS),
+          fetchSingleTab(state.sheetId, SHEET_TABS.PACKING)
+        ]);
+
+        const okCount = [scheduleRes, tipsRes, diagnosisRes, packingRes].filter(r => r.status === "fulfilled").length;
+        if (okCount === 0) {
+          handleSyncFailure(scheduleRes.reason?.message || "", isManual);
+          return;
+        }
+
+        const mergedDays = JSON.parse(JSON.stringify(state.days));
+
+        if (scheduleRes.status === "fulfilled" && scheduleRes.value?.rows) {
+          scheduleRes.value.rows.forEach(row => {
+            const dNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
+            if (dNum && dNum >= 1 && dNum <= 6) {
+              const target = mergedDays[dNum - 1];
+              const dateVal = getCellText(row, 2);
+              const detailRoute = getCellText(row, 3);
+              const simpleSummary = getCellText(row, 4);
+              const hotelVal = getCellText(row, 5);
+              const transportVal = getCellText(row, 6);
+
+              if (dateVal) { target.dateLabel = dateVal; target.shortDate = dateVal.replace(/\s+/g, ""); }
+              if (simpleSummary) { target.summary = simpleSummary; target.title = simpleSummary.split("→")[0].trim() || simpleSummary; }
+              if (detailRoute) { target.routeText = detailRoute; if (!simpleSummary) target.summary = detailRoute; }
+              if (hotelVal) target.hotel = hotelVal;
+              if (transportVal) target.transport = transportVal;
+            }
+          });
+        }
+
+        if (tipsRes.status === "fulfilled" && tipsRes.value?.rows) {
+          tipsRes.value.rows.forEach(row => {
+            const dNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
+            if (dNum && dNum >= 1 && dNum <= 6) {
+              const target = mergedDays[dNum - 1];
+              const dayTitle = getCellText(row, 2);
+              const core = splitMultilineItems(getCellText(row, 3));
+              const transit = splitMultilineItems(getCellText(row, 4));
+              const ticket = splitMultilineItems(getCellText(row, 5));
+              const check = splitMultilineItems(getCellText(row, 6));
+
+              if (dayTitle) {
+                const cleanT = dayTitle.replace(/^\d+\/\d+\s*\([^)]+\)\s*/, "").trim();
+                if (cleanT) target.title = cleanT;
+              }
+              if (core.length) target.coreTips = core;
+              if (transit.length) target.transitTips = transit;
+              if (ticket.length) target.ticketTips = ticket;
+              if (check.length) target.checklist = check;
+            }
+          });
+        }
+
+        if (diagnosisRes.status === "fulfilled" && diagnosisRes.value?.rows) {
+          diagnosisRes.value.rows.forEach(row => {
+            const dNum = extractDayNumber(getCellText(row, 1)) || extractDayNumber(getCellText(row, 0));
+            if (dNum && dNum >= 1 && dNum <= 6) {
+              const target = mergedDays[dNum - 1];
+              const fatigue = getCellText(row, 3);
+              const diag = getCellText(row, 4);
+              const alts = splitMultilineItems(getCellText(row, 5));
+              if (fatigue) target.fatigueLevel = fatigue;
+              if (diag) target.diagnosis = diag;
+              if (alts.length) target.alternatives = alts;
+            }
+          });
+        }
+
+        let parsedPacking = state.packing;
+        if (packingRes.status === "fulfilled" && packingRes.value?.rows) {
+          const temp = [];
+          let lastCat = "기타 준비물";
+          packingRes.value.rows.forEach((row, idx) => {
+            const cat = getCellText(row, 2);
+            const item = getCellText(row, 3);
+            const qty = getCellText(row, 4);
+            const tip = getCellText(row, 5);
+            if (!item && !qty && !tip) return;
+            if (!item || item === "0" || item === "0 항목" || item === "준비물 항목" || item === "항목" || item.includes("합계")) return;
+            if (cat && cat !== "카테고리") lastCat = cat;
+            temp.push({
+              id: `sheet_p_${idx}`,
+              category: lastCat,
+              item,
+              qty: qty || "-",
+              tip: tip || "",
+              sheetChecked: getCellBool(row, 1) || getCellBool(row, 6)
+            });
+          });
+          if (temp.length) parsedPacking = temp;
+        }
+
+        const nowStr = formatKoreanDateTime(new Date());
+        state.days = mergedDays;
+        state.packing = parsedPacking;
+        state.syncMode = "live";
+        state.lastSyncTime = nowStr;
+
+        localStorage.setItem(STORAGE_KEYS.CACHED_DATA, JSON.stringify({ days: state.days, packing: state.packing }));
+        localStorage.setItem(STORAGE_KEYS.LAST_SYNC, nowStr);
+
+        document.getElementById("fallbackBanner").classList.add("hidden");
+        updateSyncStatusUI();
+        renderPage();
+        if (isManual) showToast("✅ Google 시트와 연결되었습니다.");
+      } catch (err) {
+        handleSyncFailure(err.message, isManual);
+      } finally {
+        if (icon) icon.classList.remove("spin-loading");
+      }
+    }
+
+    function handleSyncFailure(reason, isManual) {
+      const hasCache = !!localStorage.getItem(STORAGE_KEYS.CACHED_DATA);
+      state.syncMode = hasCache ? "cache" : "fallback";
+      updateSyncStatusUI();
+      renderPage();
+
+      const banner = document.getElementById("fallbackBanner");
+      const msg = document.getElementById("fallbackBannerMsg");
+      banner.classList.remove("hidden");
+      msg.textContent = reason === "PRIVATE_SHEET"
+        ? "시트가 비공개 상태입니다. [공유 → 링크가 있는 모든 사용자(뷰어)]로 설정해 주세요."
+        : (hasCache ? "시트 연결이 지연되어 저장된 캐시 데이터를 표시합니다." : "기본 내장 데이터를 표시 중입니다. 설정에서 시트 공유를 확인해 주세요.");
+
+      if (isManual) showToast("⚠️ 시트 연결에 실패해 저장된 데이터를 표시합니다.");
+    }
+
+    function formatKoreanDateTime(date) {
+      return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+    }
+
+    function updateSyncStatusUI() {
+      const timeText = document.getElementById("lastSyncTimeText");
+      const modalStatus = document.getElementById("settingsSyncStatus");
+      const modalTime = document.getElementById("settingsSyncTime");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const refreshIcon = document.getElementById("refreshIcon");
+
+      if (state.syncMode === "live") {
+        if (timeText) timeText.textContent = `시트 연결됨 · ${state.lastSyncTime || "방금 전"}`;
+        if (modalStatus) modalStatus.textContent = "🟢 실시간 Google 시트 연결됨";
+        if (refreshBtn) {
+          refreshBtn.className = "trip-action sync";
+          refreshBtn.style.background = "";
+          refreshBtn.style.borderColor = "";
+          refreshBtn.style.color = "";
+          refreshBtn.title = "시트 연결됨 · 탭하여 새로고침";
+          refreshBtn.setAttribute("aria-label", "시트 연결됨 · 새로고침");
+        }
+        if (refreshIcon) refreshIcon.textContent = "↻";
+      } else if (state.syncMode === "cache") {
+        if (timeText) timeText.textContent = `캐시 사용 중 · 마지막 동기화 ${state.lastSyncTime || "기록 없음"}`;
+        if (modalStatus) modalStatus.textContent = "🟡 오프라인 캐시 데이터";
+        if (refreshBtn) {
+          refreshBtn.className = "trip-action sync";
+          refreshBtn.style.background = "#fffbeb";
+          refreshBtn.style.borderColor = "#fde68a";
+          refreshBtn.style.color = "#92400e";
+          refreshBtn.title = "캐시 사용 중 · 탭하여 다시 연결";
+          refreshBtn.setAttribute("aria-label", "캐시 사용 중 · 다시 연결");
+        }
+        if (refreshIcon) refreshIcon.textContent = "↻";
+      } else {
+        if (timeText) timeText.textContent = "기본 데이터 · 시트 연결 확인 필요";
+        if (modalStatus) modalStatus.textContent = "⚪ 기본 내장 데이터";
+        if (refreshBtn) {
+          refreshBtn.className = "trip-action sync";
+          refreshBtn.style.background = "#ffffff";
+          refreshBtn.style.borderColor = "#cbd5e1";
+          refreshBtn.style.color = "#475569";
+          refreshBtn.title = "시트 연결 · 탭하여 다시 시도";
+          refreshBtn.setAttribute("aria-label", "시트 연결 다시 시도");
+        }
+        if (refreshIcon) refreshIcon.textContent = "↻";
+      }
+      if (modalTime) modalTime.textContent = state.lastSyncTime || "기록 없음";
+    }
+
+    // =========================================================================
+    // 8. 페이지 전환 & 렌더링 (일정&팁 / 번역 / 지출 / 준비물) + 설정 팝업
+    // =========================================================================
+    function switchPage(pageKey) {
+      if (!["schedule", "translate", "expense", "packing"].includes(pageKey)) return;
+      state.activePage = pageKey;
+      saveLocalPreferences();
+      updateBottomNavUI();
+      renderPage();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function openSettingsModal() {
+      const sidInput = document.getElementById("setSheetId");
+      const webhookInput = document.getElementById("setWebhookUrl");
+      const rateInput = document.getElementById("settingsRateInput");
+      const fmtRate = Number.isInteger(Number(state.ratePer100)) ? String(state.ratePer100) : Number(state.ratePer100).toFixed(1);
+
+      if (sidInput) sidInput.value = state.sheetId;
+      if (webhookInput) webhookInput.value = state.expenseWebhookUrl;
+      if (rateInput) rateInput.value = fmtRate;
+      updateSyncStatusUI();
+      openModal("settingsModal");
+    }
+
+    function updateBottomNavUI() {
+      const map = {
+        schedule: "bg-[#1E3A5F] text-white shadow-sm",
+        translate: "bg-rose-700 text-white shadow-sm",
+        expense: "bg-emerald-700 text-white shadow-sm",
+        packing: "bg-[#C84B31] text-white shadow-sm"
+      };
+      ["schedule", "translate", "expense", "packing"].forEach(k => {
+        const el = document.getElementById(`nav-${k}`);
+        if (!el) return;
+        el.className = `flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition ${
+          state.activePage === k ? map[k] : "text-slate-700 hover:bg-white/60"
+        }`;
+      });
+    }
+
+    function renderPage() {
+      updateBottomNavUI();
+      updateRateLabels();
+      if (state.activePage === "translate") {
+        renderTranslatePage();
+      } else if (state.activePage === "expense") {
+        renderExpensePage();
+      } else if (state.activePage === "packing") {
+        renderPackingPage();
+      } else {
+        renderSchedulePage();
+      }
+    }
+
+    function getFatigueBadgeStyle(levelText) {
+      const t = String(levelText || "");
+      if (t.includes("낮음")) return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      if (t.includes("높음") && !t.includes("중")) return "bg-rose-100 text-rose-800 border-rose-200";
+      return "bg-amber-100 text-amber-800 border-amber-200";
+    }
+
+    function openPhotoSpots() {
+      openModal("photoSpotsModal");
+      const link = document.getElementById("photoMapsNearby");
+
+      const setFallback = () => {
+        link.href = "https://www.google.com/maps/search/사진+스팟/@35.0116,135.7681,14z";
+      };
+
+      if (!navigator.geolocation) return setFallback();
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          link.href = `https://www.google.com/maps/search/사진+스팟/@${latitude},${longitude},15z`;
+        },
+        setFallback,
+        { enableHighAccuracy: false, timeout: 7000, maximumAge: 300000 }
+      );
+    }
+
+    function mapsSearchUrl(query) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+
+    function mapsDirectionsUrl(destination) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=transit`;
+    }
+
+    function getStepMapQuery(step) {
+      const cleaned = String(step)
+        .replace(/\(.*?\)/g, "")
+        .replace(/\d{1,2}:\d{2}/g, "")
+        .replace(/[→·]/g, " ")
+        .trim();
+      return cleaned || "교토역";
+    }
+
+    function isTransitStep(step) {
+      return /(역|공항|이동|택시|버스|전철|지하철|JR|메트로|탑승|하차|리무진)/.test(step);
+    }
+
+    // [페이지 1] 일정&팁
+    function renderSchedulePage() {
+      const data = state.days[state.dayIndex];
+      const main = document.getElementById("mainContainer");
+      const routeSteps = splitRouteSteps(data.routeText);
+      const totalChecks = data.checklist.length;
+      const doneChecks = data.checklist.filter((_, i) => state.checks[`d${data.day}_c${i}`]).length;
+      const pct = totalChecks > 0 ? Math.round((doneChecks / totalChecks) * 100) : 0;
+
+      main.innerHTML = `
+        <!-- Day 1~6 선택 바 -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+          ${state.days.map((d, idx) => {
+            const active = state.dayIndex === idx;
+            return `
+              <button onclick="selectDay(${idx})" class="shrink-0 px-3 py-1.5 rounded-2xl border text-left transition ${
+                active ? "bg-[#1E3A5F] text-white border-[#1E3A5F]" : "bg-white text-stone-700 border-stone-200"
+              }">
+                <div class="text-xs font-extrabold">Day ${d.day}</div>
+                <div class="text-[10px] ${active ? "text-blue-200" : "text-stone-400"}">${d.shortDate}</div>
+              </button>
+            `;
+          }).join("")}
+        </div>
+
+        <!-- 일차 요약 -->
+        <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-xl bg-[#C84B31] text-white text-xs font-extrabold">DAY ${data.day} · ${data.dateLabel}</span>
+              <span class="text-xs font-bold text-stone-500">${data.region}</span>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${getFatigueBadgeStyle(data.fatigueLevel)}">체력: ${data.fatigueLevel}</span>
+          </div>
+          <h2 class="text-[18px] font-extrabold text-stone-900 leading-snug">${sanitizeTimeStrings(data.title)}</h2>
+          <p class="mt-2 text-[13px] leading-relaxed text-stone-600 bg-stone-50 p-3 rounded-2xl border border-stone-100">${sanitizeTimeStrings(data.summary)}</p>
+        </section>
+
+        ${renderAccordionCard({
+          id: "timeline", icon: "🗺️", title: "타임라인", badge: `${routeSteps.length}단계`,
+          headerActions: `
+            <div class="flex items-center gap-1 shrink-0 pr-3">
+              <a href="${mapsDirectionsUrl(data.hotel)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                 class="px-2 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-bold whitespace-nowrap active:scale-95 transition">숙소로</a>
+              <a href="${mapsSearchUrl(data.region + " 관광명소")}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                 class="px-2 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold whitespace-nowrap active:scale-95 transition">오늘의 경로</a>
+            </div>
+          `,
+          contentHtml: `
+            <div class="relative pl-4 border-l-2 border-indigo-100 space-y-2 my-1">
+              ${routeSteps.map((step, idx) => {
+                const key = `d${data.day}_s${idx}`;
+                const done = !!state.steps[key];
+                const mapQuery = getStepMapQuery(step);
+                const transit = isTransitStep(step);
+                const recommendedUrl = transit ? mapsDirectionsUrl(mapQuery) : mapsSearchUrl(mapQuery);
+                const secondaryUrl = transit ? mapsSearchUrl(mapQuery) : mapsDirectionsUrl(mapQuery);
+                const recommendedLabel = transit ? "길찾기" : "목적지";
+                const secondaryLabel = transit ? "목적지" : "길찾기";
+
+                return `
+                  <div onclick="toggleStep('${key}')" class="relative cursor-pointer check-bounce">
+                    <span class="absolute -left-[23px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 ${done ? "bg-emerald-500 border-emerald-500" : "bg-white border-[#1E3A5F]"}"></span>
+                    <div class="p-3 rounded-2xl border ${done ? "bg-stone-50 border-stone-200/60 text-stone-400" : "bg-white border-stone-200/70 text-stone-800"}">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="flex-1 text-[13px] font-medium leading-snug ${done ? "line-through" : ""}">${step}</span>
+                        <div class="flex items-center gap-1 shrink-0">
+                          <a href="${recommendedUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                             class="px-2 py-1 rounded-lg bg-[#1E3A5F] text-white text-[10px] font-extrabold active:scale-95 transition">
+                            ${recommendedLabel}
+                          </a>
+                          <a href="${secondaryUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                             class="px-2 py-1 rounded-lg bg-white border border-stone-200 text-stone-700 text-[10px] font-extrabold active:scale-95 transition">
+                            ${secondaryLabel}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `
+        })}
+
+        ${renderAccordionCard({
+          id: "coreTips", icon: "💡", title: "핵심 유의사항 & 실전 팁", badge: `${data.coreTips.length}개`,
+          contentHtml: `<ul class="space-y-2">${data.coreTips.map(t => `<li class="p-3 rounded-2xl bg-amber-50/50 border border-amber-100 text-[13px] text-stone-700 leading-relaxed">• ${formatBracketBold(t)}</li>`).join("")}</ul>`
+        })}
+
+        ${renderAccordionCard({
+          id: "transitTips", icon: "🚇", title: "교통 환승 & 무계단 동선", badge: `${data.transitTips.length}개`,
+          contentHtml: `<ul class="space-y-2">${data.transitTips.map(t => `<li class="p-3 rounded-2xl bg-sky-50/50 border border-sky-100 text-[13px] text-stone-700 leading-relaxed">▸ ${formatBracketBold(t)}</li>`).join("")}</ul>`
+        })}
+
+        ${renderAccordionCard({
+          id: "ticketTips", icon: "🎟️", title: "입장료 & 발권 팁", badge: "요금",
+          contentHtml: `<ul class="space-y-2">${data.ticketTips.map(t => `<li class="p-3 rounded-2xl bg-stone-50 border border-stone-200/80 text-[13px] text-stone-700 leading-relaxed">¥ ${formatBracketBold(t)}</li>`).join("")}</ul>`
+        })}
+
+        ${renderAccordionCard({
+          id: "diagnosis", icon: "🛡️", title: "체력 진단 & 플랜 B 대안", badge: data.fatigueLevel,
+          contentHtml: `
+            <div class="space-y-2.5 text-[13px] text-stone-700">
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">${data.diagnosis}</div>
+              <div class="p-3 rounded-2xl bg-orange-50/70 border border-orange-200/70 space-y-1">
+                ${data.alternatives.map(a => `<div>• ${formatBracketBold(a)}</div>`).join("")}
+              </div>
+            </div>
+          `
+        })}
+
+        <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-[15px] font-extrabold text-stone-900">✅ 오늘의 체크리스트</h3>
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${pct === 100 ? "bg-emerald-100 text-emerald-800" : "bg-indigo-50 text-[#1E3A5F]"}">${doneChecks}/${totalChecks} (${pct}%)</span>
+          </div>
+          <div class="w-full h-2 bg-stone-100 rounded-full overflow-hidden mb-3.5">
+            <div class="h-full rounded-full transition-all ${pct === 100 ? "bg-emerald-500" : "bg-[#1E3A5F]"}" style="width:${pct}%"></div>
+          </div>
+          <div class="space-y-2">
+            ${data.checklist.map((item, idx) => {
+              const k = `d${data.day}_c${idx}`;
+              const checked = !!state.checks[k];
+              return `
+                <div onclick="toggleDayCheck('${k}')" class="flex items-start gap-3 p-3 rounded-2xl border cursor-pointer check-bounce ${checked ? "bg-emerald-50/40 border-emerald-200 text-stone-400" : "bg-stone-50/70 border-stone-200 text-stone-800"}">
+                  <div class="mt-0.5 w-5 h-5 rounded-lg flex items-center justify-center shrink-0 border ${checked ? "bg-emerald-500 border-emerald-500 text-white" : "bg-white border-stone-300"}">
+                    ${checked ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ""}
+                  </div>
+                  <span class="text-[13px] font-medium leading-snug ${checked ? "line-through" : ""}">${item}</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    // [페이지 2] 번역 (일본어 회화 목록 + 클릭 시 가로화면 큰글씨 확대)
+    function renderTranslatePage() {
+      const main = document.getElementById("mainContainer");
+      const categories = ["전체", "택시", "호텔", "식당", "기타/쇼핑"];
+      const filtered = JAPANESE_PHRASES.filter(p => state.phraseCategoryFilter === "전체" || p.category === state.phraseCategoryFilter);
+
+      main.innerHTML = `
+        <section class="bg-white rounded-3xl p-4 shadow-xs border border-stone-200/80 animate-card space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-[17px] font-extrabold text-stone-900">🗣️ 여행 일본어 번역</h2>
+              <p class="text-xs text-stone-500">문장을 누르면 가로화면으로 크게 확대됩니다</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-900 text-xs font-extrabold">${filtered.length}개</span>
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            ${categories.map(cat => `
+              <button onclick="setPhraseCategory('${cat}')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border ${
+                state.phraseCategoryFilter === cat ? "bg-rose-700 text-white border-rose-700" : "bg-stone-50 text-stone-600 border-stone-200"
+              }">${cat}</button>
+            `).join("")}
+          </div>
+        </section>
+
+        <section class="space-y-2.5 animate-card">
+          ${filtered.map(p => `
+            <div onclick="openPhraseZoom(${p.id})" class="bg-white p-4 rounded-3xl shadow-xs border border-stone-200/80 hover:border-rose-300 cursor-pointer transition check-bounce">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-900 text-[10px] font-extrabold">${p.category} · ${p.situation}</span>
+                <span class="text-[11px] font-extrabold text-indigo-700">↔ 가로 확대</span>
+              </div>
+              <div class="text-[17px] font-extrabold text-stone-900 leading-snug mt-1">${p.japanese}</div>
+              <div class="text-xs font-bold text-indigo-900 mt-1">${p.pronunciation}</div>
+              <div class="text-xs text-stone-600 mt-0.5">${p.korean}</div>
+            </div>
+          `).join("")}
+        </section>
+      `;
+    }
+
+    // [페이지 3] 여행 지출내역 (입력 -> Google 시트 전송 + 환율 반영 집계)
+    function renderExpensePage() {
+      const main = document.getElementById("mainContainer");
+      const rate = getRatePerYen();
+      const totalJpy = state.expenses.filter(e => e.currency === "JPY").reduce((s, e) => s + (Number(e.amount) || 0), 0);
+      const totalKrwDirect = state.expenses.filter(e => e.currency === "KRW").reduce((s, e) => s + (Number(e.amount) || 0), 0);
+      const totalKrwEst = Math.round(totalJpy * rate) + totalKrwDirect;
+      const defaultDay = state.dayIndex + 1;
+
+      main.innerHTML = `
+        <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-[17px] font-extrabold text-stone-900">💳 여행 지출내역</h2>
+            <button onclick="openModal('currencyModal')" class="px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">
+              환율 100엔=${Number(state.ratePer100)}원
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="p-3 rounded-2xl bg-amber-50/80 border border-amber-200/80">
+              <div class="text-[11px] font-bold text-amber-800">엔화 지출 합계</div>
+              <div class="text-lg font-extrabold text-stone-900 mt-0.5">¥${totalJpy.toLocaleString()}</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200/80">
+              <div class="text-[11px] font-bold text-emerald-800">원화 환산 합계</div>
+              <div class="text-lg font-extrabold text-stone-900 mt-0.5">₩${totalKrwEst.toLocaleString()}</div>
+            </div>
+          </div>
+
+          <form onsubmit="handleExpenseSubmit(event)" class="space-y-2.5 text-xs pt-1">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-bold text-stone-600 mb-1">일차</label>
+                <select id="expDay" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-bold text-stone-800">
+                  ${[1, 2, 3, 4, 5, 6].map(d => `<option value="${d}일차" ${d === defaultDay ? "selected" : ""}>Day ${d} (${d}일차)</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-stone-600 mb-1">분류</label>
+                <select id="expCategory" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-bold text-stone-800">
+                  <option value="식비">식비·카페</option>
+                  <option value="교통">택시·전철·버스</option>
+                  <option value="관광·입장">입장료·체험</option>
+                  <option value="쇼핑">쇼핑·면세</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-bold text-stone-600 mb-1">통화</label>
+                <select id="expCurrency" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-bold text-stone-800">
+                  <option value="JPY">엔화 (JPY ¥)</option>
+                  <option value="KRW">원화 (KRW ₩)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-stone-600 mb-1">결제수단</label>
+                <select id="expPayment" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-bold text-stone-800">
+                  <option value="현금">현금</option>
+                  <option value="카드/Suica">카드 · Suica</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-bold text-stone-600 mb-1">내역</label>
+                <input id="expItem" type="text" required placeholder="예: 교토역→호텔 택시" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-semibold text-stone-900 focus:outline-none focus:border-emerald-600" />
+              </div>
+              <div>
+                <label class="block font-bold text-stone-600 mb-1">금액</label>
+                <input id="expAmount" type="number" min="1" step="any" required placeholder="예: 1200" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-extrabold text-stone-900 focus:outline-none focus:border-emerald-600" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-stone-600 mb-1">메모 (선택)</label>
+              <input id="expMemo" type="text" placeholder="메모 입력" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 focus:outline-none" />
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm active:scale-[0.98] transition">
+              지출 저장 및 Google 시트 입력
+            </button>
+          </form>
+        </section>
+
+        <section class="bg-white rounded-3xl p-4 shadow-xs border border-stone-200/80 space-y-2 animate-card">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-extrabold text-stone-900">지출 내역 (${state.expenses.length}건)</h3>
+            ${state.expenses.length > 0 ? `<button onclick="clearExpenses()" class="text-[11px] text-stone-400 hover:text-rose-600 font-semibold">전체 삭제</button>` : ""}
+          </div>
+          ${state.expenses.length === 0 ? `
+            <p class="text-xs text-stone-400 text-center py-5">등록된 지출이 없습니다.</p>
+          ` : state.expenses.map(exp => {
+            const krwEst = exp.currency === "KRW" ? Number(exp.amount) : Math.round((Number(exp.amount) || 0) * rate);
+            return `
+              <div class="p-3 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center justify-between gap-2 text-xs">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-1.5 py-0.5 rounded bg-stone-200 text-stone-700 text-[10px] font-bold">${exp.day}</span>
+                    <span class="font-bold text-emerald-800">${exp.category}</span>
+                    <span class="text-[10px] text-stone-400">${exp.payment}</span>
+                  </div>
+                  <div class="font-bold text-stone-900 text-sm mt-0.5 truncate">${exp.item}</div>
+                  ${exp.memo ? `<div class="text-[11px] text-stone-500 truncate">${exp.memo}</div>` : ""}
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="font-extrabold text-stone-900 text-sm">${exp.currency === "JPY" ? "¥" : "₩"}${Number(exp.amount).toLocaleString()}</div>
+                  <div class="text-[11px] text-stone-500">약 ₩${krwEst.toLocaleString()}</div>
+                  <button onclick="deleteExpense('${exp.id}')" class="text-[10px] text-rose-500 font-semibold mt-0.5">삭제</button>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </section>
+      `;
+    }
+
+    // [페이지 4] 준비물
+    function isPackingItemChecked(item) {
+      if (Object.prototype.hasOwnProperty.call(state.packingChecks, item.id)) return !!state.packingChecks[item.id];
+      return !!item.sheetChecked;
+    }
+
+    function renderPackingPage() {
+      const main = document.getElementById("mainContainer");
+      const categories = ["전체", ...new Set(state.packing.map(p => p.category))];
+      if (!categories.includes(state.packingCategoryFilter)) state.packingCategoryFilter = "전체";
+
+      const total = state.packing.length;
+      const done = state.packing.filter(p => isPackingItemChecked(p)).length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      const list = state.packingCategoryFilter === "전체" ? state.packing : state.packing.filter(p => p.category === state.packingCategoryFilter);
+
+      main.innerHTML = `
+        <section class="bg-white rounded-3xl p-5 shadow-xs border border-stone-200/80 animate-card">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-[17px] font-extrabold text-stone-900">🎒 여행 준비물</h2>
+            <span class="text-xs font-extrabold text-[#C84B31]">${done}/${total} (${pct}%)</span>
+          </div>
+          <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
+            <div class="h-full bg-[#C84B31] transition-all" style="width:${pct}%"></div>
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-3">
+            ${categories.map(cat => `
+              <button onclick="setPackingFilter('${cat.replace(/'/g, "\\'")}')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border ${
+                state.packingCategoryFilter === cat ? "bg-[#1E3A5F] text-white border-[#1E3A5F]" : "bg-stone-50 text-stone-600 border-stone-200"
+              }">${cat}</button>
+            `).join("")}
+          </div>
+        </section>
+
+        <section class="bg-white rounded-3xl p-4 shadow-xs border border-stone-200/80 space-y-2 animate-card">
+          ${list.map(item => {
+            const checked = isPackingItemChecked(item);
+            return `
+              <div onclick="togglePackingCheck('${item.id}')" class="p-3.5 rounded-2xl border cursor-pointer check-bounce ${checked ? "bg-emerald-50/40 border-emerald-200" : "bg-stone-50/70 border-stone-200"}">
+                <div class="flex items-start gap-3">
+                  <div class="mt-0.5 w-5 h-5 rounded-lg flex items-center justify-center shrink-0 border ${checked ? "bg-emerald-500 border-emerald-500 text-white" : "bg-white border-stone-300"}">
+                    ${checked ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ""}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-[14px] font-bold ${checked ? "line-through text-stone-400" : "text-stone-900"}">${item.item}</span>
+                      <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 text-[#1E3A5F]">${item.qty}</span>
+                    </div>
+                    ${item.tip ? `<p class="mt-1 text-xs ${checked ? "text-stone-400" : "text-stone-600"}">${item.tip}</p>` : ""}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </section>
+      `;
+    }
+
+    function renderAccordionCard({ id, icon, title, badge, contentHtml, headerActions = "" }) {
+      const isOpen = !!state.accordion[id];
+      return `
+        <section class="bg-white rounded-3xl shadow-xs border border-stone-200/80 overflow-hidden animate-card">
+          <div class="w-full px-3 sm:px-5 py-3.5 flex items-center gap-2">
+            <button onclick="toggleAccordion('${id}')" class="flex-1 min-w-0 flex items-center justify-between text-left active:bg-stone-50 transition" aria-expanded="${isOpen}">
+              <span class="flex items-center gap-2 min-w-0">
+                <span class="text-lg leading-none shrink-0">${icon}</span>
+                <h3 class="text-[15px] font-extrabold text-stone-900 tracking-tight truncate">${title}</h3>
+                ${badge ? `<span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 text-[11px] font-bold shrink-0">${badge}</span>` : ""}
+              </span>
+              <svg class="w-5 h-5 text-stone-400 shrink-0 transition-transform duration-200 ml-1 ${isOpen ? "rotate-180" : ""}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            ${headerActions}
+          </div>
+          <div class="px-5 pb-5 ${isOpen ? "block" : "hidden"}">${contentHtml}</div>
+        </section>
+      `;
+    }
+
+    function formatBracketBold(text) {
+      return text.replace(/(\[[^\]]+\])/g, '<strong class="text-stone-900 font-extrabold">$1</strong>');
+    }
+
+    // =========================================================================
+    // 9. 이벤트 핸들러 및 모달 제어
+    // =========================================================================
+    function selectDay(idx) {
+      if (idx < 0 || idx > 5) return;
+      state.dayIndex = idx;
+      renderSchedulePage();
+      centerActiveDayChip();
+    }
+
+    function centerActiveDayChip() {
+      const bar = document.querySelector("#mainContainer .overflow-x-auto");
+      if (!bar) return;
+      const chip = bar.children[state.dayIndex];
+      if (chip) bar.scrollLeft = chip.offsetLeft - (bar.clientWidth - chip.clientWidth) / 2;
+    }
+
+    // ---- 좌우 스와이프로 날짜 이동 (손가락 추적 + 슬라이드 애니메이션) ----
+    (function initSwipe() {
+      const SCREEN = () => window.innerWidth;
+      let sx = 0, sy = 0, dx = 0, mode = null, busy = false, startT = 0;
+      const el = () => document.getElementById("mainContainer");
+      const lastIdx = () => state.days.length - 1;
+
+      function ok(target) {
+        if (state.activePage !== "schedule" || busy) return false;
+        if (target.closest && target.closest(".overflow-x-auto, input, textarea, select, pre")) return false;
+        return true;
+      }
+      function resist(d) {
+        const atEdge = (d > 0 && state.dayIndex === 0) || (d < 0 && state.dayIndex === lastIdx());
+        return atEdge ? d * 0.25 : d;
+      }
+      function paint(x) {
+        const m = el();
+        m.style.transform = `translate3d(${x}px,0,0)`;
+        m.style.opacity = String(Math.max(0.35, 1 - Math.abs(x) / (SCREEN() * 1.1)));
+      }
+      function reset() {
+        const m = el();
+        m.classList.remove("swiping"); m.classList.add("snap");
+        m.style.transform = "translate3d(0,0,0)"; m.style.opacity = "1";
+        busy = true;
+        setTimeout(() => { m.classList.remove("snap"); m.style.transform = ""; m.style.opacity = ""; busy = false; }, 360);
+      }
+      function commit(dir) { // dir: +1 다음날(왼쪽으로 밀림), -1 이전날
+        const m = el(), W = SCREEN();
+        busy = true;
+        m.classList.remove("swiping"); m.classList.add("snap");
+        m.style.transform = `translate3d(${-dir * W}px,0,0)`; m.style.opacity = "0";
+        setTimeout(() => {
+          m.classList.remove("snap"); m.classList.add("swiping");
+          state.dayIndex += dir;
+          renderSchedulePage();
+          centerActiveDayChip();
+          window.scrollTo(0, 0);
+          m.style.transform = `translate3d(${dir * W}px,0,0)`; m.style.opacity = "0";
+          void m.offsetWidth;
+          m.classList.remove("swiping"); m.classList.add("snap");
+          m.style.transform = "translate3d(0,0,0)"; m.style.opacity = "1";
+          const d = state.days[state.dayIndex];
+          if (d) showToast(`Day ${d.day} · ${d.shortDate}`);
+          setTimeout(() => { m.classList.remove("snap"); m.style.transform = ""; m.style.opacity = ""; busy = false; }, 360);
+        }, 300);
+      }
+
+      document.addEventListener("touchstart", (e) => {
+        mode = null; dx = 0;
+        if (e.touches.length !== 1 || !ok(e.target)) { mode = "off"; return; }
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; startT = Date.now();
+      }, { passive: true });
+
+      document.addEventListener("touchmove", (e) => {
+        if (mode === "off") return;
+        const t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
+        if (mode === null) {
+          if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+          mode = Math.abs(mx) > Math.abs(my) * 1.2 ? "h" : "v";
+          if (mode === "h") el().classList.add("swiping");
+        }
+        if (mode !== "h") return;
+        dx = mx;
+        if (e.cancelable) e.preventDefault();
+        paint(resist(dx));
+      }, { passive: false });
+
+      function end() {
+        if (mode !== "h") { mode = null; return; }
+        mode = null;
+        const v = Math.abs(dx) / Math.max(1, Date.now() - startT); // px/ms
+        const go = Math.abs(dx) > SCREEN() * 0.25 || (v > 0.5 && Math.abs(dx) > 40);
+        const dir = dx < 0 ? 1 : -1;
+        const next = state.dayIndex + dir;
+        if (go && next >= 0 && next <= lastIdx()) commit(dir); else reset();
+      }
+      document.addEventListener("touchend", end, { passive: true });
+      document.addEventListener("touchcancel", end, { passive: true });
+    })();
+
+    // ---- 스크롤 시 하단 탭 숨김/표시 ----
+    (function initFooterAutoHide() {
+      let lastY = window.scrollY, ticking = false;
+      function update() {
+        const f = document.getElementById("bottomFooter");
+        const y = window.scrollY, diff = y - lastY;
+        const nearBottom = window.innerHeight + y >= document.documentElement.scrollHeight - 8;
+        if (y < 40 || nearBottom || diff < -6) f.classList.remove("nav-hidden");
+        else if (diff > 6) f.classList.add("nav-hidden");
+        if (Math.abs(diff) > 6) lastY = y;
+        ticking = false;
+      }
+      window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    })();
+
+    function toggleAccordion(id) {
+      state.accordion[id] = !state.accordion[id];
+      saveLocalPreferences();
+      renderSchedulePage();
+    }
+
+    function toggleStep(key) {
+      state.steps[key] = !state.steps[key];
+      saveLocalPreferences();
+      renderSchedulePage();
+    }
+
+    function toggleDayCheck(key) {
+      state.checks[key] = !state.checks[key];
+      saveLocalPreferences();
+      renderSchedulePage();
+    }
+
+    function togglePackingCheck(id) {
+      const target = state.packing.find(p => p.id === id);
+      state.packingChecks[id] = !(target ? isPackingItemChecked(target) : false);
+      saveLocalPreferences();
+      renderPackingPage();
+    }
+
+    function setPackingFilter(cat) {
+      state.packingCategoryFilter = cat;
+      renderPackingPage();
+    }
+
+    function setPhraseCategory(cat) {
+      state.phraseCategoryFilter = cat;
+      renderTranslatePage();
+    }
+
+    function openPhraseZoom(id) {
+      const phrase = JAPANESE_PHRASES.find(p => p.id === id);
+      if (!phrase) return;
+      state.zoomedPhrase = phrase;
+      state.isRotatedLandscape = false;
+      const card = document.getElementById("phraseZoomCard");
+      card.classList.remove("landscape-rotated");
+
+      document.getElementById("zoomSituationBadge").textContent = `${phrase.category} · ${phrase.situation}`;
+      document.getElementById("zoomJapaneseText").textContent = phrase.japanese;
+      document.getElementById("zoomPronunciationText").textContent = phrase.pronunciation;
+      document.getElementById("zoomKoreanText").textContent = phrase.korean;
+      openModal("phraseZoomModal");
+    }
+
+    function toggleLandscapeRotation() {
+      state.isRotatedLandscape = !state.isRotatedLandscape;
+      const card = document.getElementById("phraseZoomCard");
+      if (state.isRotatedLandscape) {
+        card.classList.add("landscape-rotated");
+      } else {
+        card.classList.remove("landscape-rotated");
+      }
+    }
+
+    function copyZoomedPhrase() {
+      if (state.zoomedPhrase) copyText(state.zoomedPhrase.japanese);
+    }
+
+    async function handleExpenseSubmit(event) {
+      event.preventDefault();
+      const day = document.getElementById("expDay").value;
+      const category = document.getElementById("expCategory").value;
+      const currency = document.getElementById("expCurrency").value;
+      const payment = document.getElementById("expPayment").value;
+      const item = document.getElementById("expItem").value.trim();
+      const amount = parseFloat(document.getElementById("expAmount").value);
+      const memo = document.getElementById("expMemo").value.trim();
+
+      if (!item || isNaN(amount) || amount <= 0) {
+        showToast("내역과 금액을 입력해 주세요.");
+        return;
+      }
+
+      const krwEstimate = currency === "KRW" ? Math.round(amount) : Math.round(amount * getRatePerYen());
+      const entry = {
+        id: `exp_${Date.now()}`,
+        day, category, currency, payment, item, amount, krwEstimate, memo,
+        createdAt: formatKoreanDateTime(new Date())
+      };
+
+      state.expenses.unshift(entry);
+      saveLocalPreferences();
+      renderExpensePage();
+
+      if (state.expenseWebhookUrl) {
+        try {
+          await fetch(state.expenseWebhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(entry)
+          });
+          showToast("✅ 저장 및 Google 시트 전송 완료");
+        } catch (_) {
+          showToast("⚠️ 앱 저장됨 (시트 전송 확인 필요)");
+        }
+      } else {
+        showToast("✅ 지출내역에 저장되었습니다");
+      }
+    }
+
+    function deleteExpense(id) {
+      state.expenses = state.expenses.filter(e => e.id !== id);
+      saveLocalPreferences();
+      renderExpensePage();
+      showToast("삭제되었습니다.");
+    }
+
+    function clearExpenses() {
+      state.expenses = [];
+      saveLocalPreferences();
+      renderExpensePage();
+      showToast("지출내역이 초기화되었습니다.");
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove("hidden");
+      el.classList.add("flex");
+      if (id === "currencyModal") {
+        updateRateLabels();
+        setTimeout(() => document.getElementById("jpyInput").focus(), 100);
+      }
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add("hidden");
+      el.classList.remove("flex");
+    }
+
+    function closeModalOnBackdrop(event, id) {
+      if (event.target.id === id) closeModal(id);
+    }
+
+    function onManualRateChange() {
+      const val = parseFloat(document.getElementById("ratePer100Input").value);
+      if (!isNaN(val) && val > 0) {
+        state.ratePer100 = val;
+        saveLocalPreferences();
+        updateRateLabels();
+        onJpyChange();
+        if (state.activePage === "expense") renderExpensePage();
+      }
+    }
+
+    function onSettingsRateInput(rawVal) {
+      const val = parseFloat(rawVal);
+      if (!isNaN(val) && val > 0) {
+        state.ratePer100 = val;
+        saveLocalPreferences();
+        updateRateLabels();
+      }
+    }
+
+    function applyPresetRate(val) {
+      state.ratePer100 = val;
+      saveLocalPreferences();
+      updateRateLabels();
+      onJpyChange();
+      if (state.activePage === "expense") renderExpensePage();
+      showToast(`100엔 = ${val}원으로 설정됨`);
+    }
+
+    function onJpyChange() {
+      const jpy = parseFloat(document.getElementById("jpyInput").value);
+      const krwInput = document.getElementById("krwInput");
+      if (isNaN(jpy) || jpy <= 0) { krwInput.value = ""; return; }
+      krwInput.value = Math.round(jpy * getRatePerYen());
+    }
+
+    function onKrwChange() {
+      const krw = parseFloat(document.getElementById("krwInput").value);
+      const jpyInput = document.getElementById("jpyInput");
+      if (isNaN(krw) || krw <= 0) { jpyInput.value = ""; return; }
+      jpyInput.value = Math.round(krw / getRatePerYen());
+    }
+
+    function addJpy(amt) {
+      const el = document.getElementById("jpyInput");
+      el.value = (parseFloat(el.value) || 0) + amt;
+      onJpyChange();
+    }
+
+    function clearCurrency() {
+      document.getElementById("jpyInput").value = "";
+      document.getElementById("krwInput").value = "";
+      document.getElementById("jpyInput").focus();
+    }
+
+    function saveSettingsAndSync() {
+      const sid = document.getElementById("setSheetId").value.trim();
+      const webhook = document.getElementById("setWebhookUrl").value.trim();
+      if (!sid) { showToast("시트 ID를 입력해 주세요."); return; }
+      const m = sid.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      state.sheetId = m ? m[1] : sid;
+      state.expenseWebhookUrl = webhook;
+      saveLocalPreferences();
+      closeModal("settingsModal");
+      syncFromGoogleSheet(true);
+    }
+
+    function resetDefaultSheetId() {
+      state.sheetId = DEFAULT_SHEET_ID;
+      document.getElementById("setSheetId").value = DEFAULT_SHEET_ID;
+      saveLocalPreferences();
+      showToast("기본 시트 ID로 복원되었습니다.");
+    }
+
+    function clearCachedSheetData() {
+      localStorage.removeItem(STORAGE_KEYS.CACHED_DATA);
+      localStorage.removeItem(STORAGE_KEYS.LAST_SYNC);
+      state.days = JSON.parse(JSON.stringify(FALLBACK_DAYS));
+      state.packing = JSON.parse(JSON.stringify(FALLBACK_PACKING));
+      state.syncMode = "fallback";
+      state.lastSyncTime = null;
+      updateSyncStatusUI();
+      renderPage();
+      showToast("캐시가 초기화되었습니다.");
+    }
+
+    function openSheetInNewTab() {
+      window.open(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(state.sheetId)}/edit`, "_blank", "noopener,noreferrer");
+    }
+
+    function copyText(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        showToast(`📋 "${text}" 복사됨`);
+      } catch (_) {
+        showToast("복사에 실패했습니다.");
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastMsg").textContent = msg;
+      toast.classList.remove("opacity-0");
+      setTimeout(() => toast.classList.add("opacity-0"), 2200);
+    }
+
+    // =========================================================================
+    // 10. 초기화
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadLocalState();
+      updateSyncStatusUI();
+      renderPage();
+      fetchCurrentLocationWeather(false);
+      fetchLiveExchangeRate(false);
+      syncFromGoogleSheet(false);
+    });
+  </script>
+</body>
+</html>
