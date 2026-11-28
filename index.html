@@ -64,6 +64,13 @@
     #mainContainer.swiping .animate-card { animation: none !important; opacity: 1 !important; transform: none !important; }
     #mainContainer.swiping { transition: none; }
     #mainContainer.snap { transition: transform .34s cubic-bezier(.22,.68,.32,1), opacity .34s ease; }
+    #mainContainer.edge-shake { animation: edgeShake .38s cubic-bezier(.36,.07,.19,.97) both; }
+    .schedule-outgoing { position: fixed !important; z-index: 45; pointer-events: none !important; margin: 0 !important; will-change: transform; }
+    @keyframes edgeShake {
+      0%, 100% { transform: translate3d(0,0,0); }
+      18%, 54%, 86% { transform: translate3d(-8px,0,0); }
+      36%, 70% { transform: translate3d(8px,0,0); }
+    }
     @keyframes fadeSlideUp {
       from {
         opacity: 0;
@@ -1822,10 +1829,11 @@
       if (chip) bar.scrollLeft = chip.offsetLeft - (bar.clientWidth - chip.clientWidth) / 2;
     }
 
-    // ---- 좌우 스와이프로 날짜 이동 (손가락 추적 + 슬라이드 애니메이션) ----
+    // ---- 좌우 스와이프로 날짜 이동 (연속 슬라이드 + 경계 경고) ----
     (function initSwipe() {
       const SCREEN = () => window.innerWidth;
       let sx = 0, sy = 0, dx = 0, mode = null, busy = false, startT = 0;
+      let edgeBlocked = false;
       const el = () => document.getElementById("mainContainer");
       const lastIdx = () => state.days.length - 1;
 
@@ -1834,81 +1842,94 @@
         if (target.closest && target.closest(".overflow-x-auto, input, textarea, select, pre")) return false;
         return true;
       }
-      function resist(d) {
-        const atEdge = (d > 0 && state.dayIndex === 0) || (d < 0 && state.dayIndex === lastIdx());
-        return atEdge ? d * 0.25 : d;
+      function isAtEdge(dir) {
+        return (dir < 0 && state.dayIndex === 0) || (dir > 0 && state.dayIndex === lastIdx());
       }
       function paint(x) {
         const m = el();
         m.style.transform = `translate3d(${x}px,0,0)`;
-        m.style.opacity = String(Math.max(0.35, 1 - Math.abs(x) / (SCREEN() * 1.1)));
+        m.style.opacity = "1";
+      }
+      function clearMotion(m) {
+        m.classList.remove("swiping", "snap", "edge-shake");
+        m.style.transform = "";
+        m.style.opacity = "";
       }
       function reset() {
         const m = el();
         busy = true;
         m.classList.remove("swiping");
         m.classList.add("snap");
-        // 손가락을 놓은 위치를 출발점으로 확정한 뒤 원위치로 부드럽게 복귀
         void m.offsetWidth;
         requestAnimationFrame(() => {
           m.style.transform = "translate3d(0,0,0)";
           m.style.opacity = "1";
         });
-        setTimeout(() => {
-          m.classList.remove("snap");
-          m.style.transform = "";
-          m.style.opacity = "";
-          busy = false;
-        }, 380);
+        setTimeout(() => { clearMotion(m); busy = false; }, 380);
       }
-      function commit(dir) { // dir: +1 다음날(왼쪽으로 밀림), -1 이전날
-        const m = el(), W = SCREEN();
+      function edgeWarning(dir) {
+        const m = el();
+        busy = true;
+        clearMotion(m);
+        void m.offsetWidth;
+        m.classList.add("edge-shake");
+        showToast(dir < 0 ? "첫째 날입니다 · 더 이전 일정이 없어요" : "마지막 날입니다 · 더 다음 일정이 없어요");
+        setTimeout(() => { m.classList.remove("edge-shake"); busy = false; }, 420);
+      }
+      function commit(dir) {
+        const m = el();
+        const rect = m.getBoundingClientRect();
+        const W = rect.width;
         busy = true;
 
-        // 1) 현재 날짜 화면을 손가락이 움직인 위치에서 화면 밖으로 밀어냄
-        m.classList.remove("swiping");
-        m.classList.add("snap");
-        void m.offsetWidth;
+        // 현재 화면을 복제해 그대로 유지하고, 새 날짜 화면을 반대편에 배치한다.
+        const outgoing = m.cloneNode(true);
+        outgoing.removeAttribute("id");
+        outgoing.classList.remove("swiping", "snap", "edge-shake");
+        outgoing.classList.add("schedule-outgoing");
+        outgoing.style.left = `${rect.left}px`;
+        outgoing.style.top = `${rect.top}px`;
+        outgoing.style.width = `${rect.width}px`;
+        outgoing.style.height = `${rect.height}px`;
+        // rect.left에 손가락으로 이동한 현재 위치가 이미 반영되어 있다.
+        outgoing.style.transform = "translate3d(0,0,0)";
+        outgoing.style.opacity = "1";
+        document.body.appendChild(outgoing);
+
+        // 새 페이지를 즉시 렌더링해 공백 없이 이어 붙인다.
+        state.dayIndex = Math.max(0, Math.min(lastIdx(), state.dayIndex + dir));
+        renderSchedulePage();
+        centerActiveDayChip();
+        const fresh = el();
+        fresh.classList.remove("swiping", "snap");
+        fresh.style.transition = "none";
+        // 새 패널을 현재 패널의 바로 옆(손가락 이동량 포함)에 붙여 빈틈을 없앤다.
+        fresh.style.transform = `translate3d(${dx + dir * W}px,0,0)`;
+        fresh.style.opacity = "1";
+        void fresh.offsetWidth;
+
         requestAnimationFrame(() => {
-          m.style.transform = `translate3d(${-dir * W}px,0,0)`;
-          m.style.opacity = "0";
+          requestAnimationFrame(() => {
+            outgoing.style.transition = "transform .34s cubic-bezier(.22,.68,.32,1)";
+            fresh.style.transition = "transform .34s cubic-bezier(.22,.68,.32,1)";
+            outgoing.style.transform = `translate3d(${-dir * W}px,0,0)`;
+            fresh.style.transform = "translate3d(0,0,0)";
+          });
         });
 
-        // 2) 화면 밖으로 완전히 나간 뒤 새 날짜를 반대편에 배치하고 안으로 이동
+        const d = state.days[state.dayIndex];
+        if (d) showToast(`Day ${d.day} · ${d.shortDate}`);
         setTimeout(() => {
-          state.dayIndex = Math.max(0, Math.min(lastIdx(), state.dayIndex + dir));
-          renderSchedulePage();
-          centerActiveDayChip();
-          window.scrollTo({ top: 0, behavior: "instant" });
-
-          // 전환을 잠시 끄고 새 화면을 반대편에 배치한 다음, 다음 프레임부터 전환 시작
-          m.classList.remove("snap");
-          m.classList.add("swiping");
-          m.style.transform = `translate3d(${dir * W}px,0,0)`;
-          m.style.opacity = "0";
-          void m.offsetWidth;
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              m.classList.remove("swiping");
-              m.classList.add("snap");
-              m.style.transform = "translate3d(0,0,0)";
-              m.style.opacity = "1";
-            });
-          });
-
-          const d = state.days[state.dayIndex];
-          if (d) showToast(`Day ${d.day} · ${d.shortDate}`);
-          setTimeout(() => {
-            m.classList.remove("snap", "swiping");
-            m.style.transform = "";
-            m.style.opacity = "";
-            busy = false;
-          }, 420);
-        }, 350);
+          outgoing.remove();
+          fresh.style.transition = "";
+          fresh.style.transform = "";
+          fresh.style.opacity = "";
+          busy = false;
+        }, 390);
       }
 
       document.addEventListener("touchstart", (e) => {
-        mode = null; dx = 0;
+        mode = null; dx = 0; edgeBlocked = false;
         if (e.touches.length !== 1 || !ok(e.target)) { mode = "off"; return; }
         sx = e.touches[0].clientX; sy = e.touches[0].clientY; startT = Date.now();
       }, { passive: true });
@@ -1923,18 +1944,33 @@
         }
         if (mode !== "h") return;
         dx = mx;
-        if (e.cancelable) e.preventDefault();
-        paint(resist(dx));
+        const dir = dx < 0 ? 1 : -1;
+        if (isAtEdge(dir)) {
+          edgeBlocked = true;
+          const m = el();
+          m.style.transform = "translate3d(0,0,0)";
+          m.style.opacity = "1";
+        } else {
+          edgeBlocked = false;
+          if (e.cancelable) e.preventDefault();
+          paint(dx);
+        }
       }, { passive: false });
 
       function end() {
         if (mode !== "h") { mode = null; return; }
         mode = null;
-        const v = Math.abs(dx) / Math.max(1, Date.now() - startT); // px/ms
+        const v = Math.abs(dx) / Math.max(1, Date.now() - startT);
         const go = Math.abs(dx) > SCREEN() * 0.25 || (v > 0.5 && Math.abs(dx) > 40);
         const dir = dx < 0 ? 1 : -1;
         const next = state.dayIndex + dir;
-        if (go && next >= 0 && next <= lastIdx()) commit(dir); else reset();
+        if (go && edgeBlocked && isAtEdge(dir)) {
+          edgeWarning(dir);
+        } else if (go && next >= 0 && next <= lastIdx()) {
+          commit(dir);
+        } else {
+          reset();
+        }
       }
       document.addEventListener("touchend", end, { passive: true });
       document.addEventListener("touchcancel", end, { passive: true });
